@@ -19,7 +19,7 @@ function progress(ctx, t) {
   }
   // tiny brand row under the bars, like a story header
   drawMark(ctx, RTL ? W - 88 : 88, 348, 34, C.brand, 1);
-  text(ctx, "Fleetana", RTL ? W - 124 : 124, 360, { size: 26, weight: 700, font: F.head, color: C.fg, align: AL("left") });
+  text(ctx, S.brandName, RTL ? W - 124 : 124, 360, { size: 26, weight: 700, font: RTL ? F.ar : F.head, color: C.fg, align: AL("left"), dir: DIR });
   ctx.restore();
 }
 
@@ -62,7 +62,7 @@ const DRAW = [
     const flag = E.hero(seg(lt, 1.2, 1.6)), v = lerp(9.2, 5.9, E.inOutCubic(seg(lt, 0.5, 1.3)));
     bn(ctx, b, v.toFixed(1), 48, 300, { size: 150, weight: 700, color: flag > 0.5 ? "#fbbf24" : C.fg });
     ctx.save(); ctx.font = `700 150px ${F.ui}`; const vw = ctx.measureText(v.toFixed(1)).width; ctx.restore();
-    bn(ctx, b, "km/L", 48 + vw + 20, 296, { size: 44, weight: 600, color: C.muted });
+    bt(ctx, b, S.u.kmL, 48 + vw + 20, 296, { size: 44, weight: 600, color: C.muted });
     if (flag > 0) { ctx.save(); ctx.globalAlpha *= flag; statusPill(ctx, bx(b, b.w - 48), b.y + 250, S.low, "warn", { size: 34, rtl: RTL, align: "right", dot: false }); ctx.restore(); }
     // last five fills
     const vals = [9.4, 9.0, 9.3, 9.1, v], base = b.y + 560;
@@ -134,7 +134,7 @@ function endCard(ctx, t) {
   if (RTL) text(ctx, "فليتانا", W / 2, 950, { size: 46, weight: 600, font: F.ar, color: C.heading, align: "center", alpha: E.hero(seg(u, 0.9, 1.5)), dir: "rtl" });
   S.f3.cta.forEach((l, i) => riseText(ctx, l, W / 2, (RTL ? 1110 : 1060) + i * 104, seg(u, 0.9 + i * 0.2, 1.6 + i * 0.2),
     { size: RTL ? 80 : 86, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
-  const bk = E.hero(seg(u, 1.6, 2.2));
+  const bk = E.hero(seg(u, 1.2, 1.7));
   if (bk > 0) { ctx.save(); ctx.globalAlpha *= bk; ctx.translate(0, (1 - bk) * 30); ctx.font = `600 44px ${F.ui}`; const w = ctx.measureText(S.url).width + 110;
     rr(ctx, W / 2 - w / 2, 1330, w, 100, 50); ctx.fillStyle = C.brand; ctx.fill();
     text(ctx, S.url, W / 2, 1395, { size: 44, weight: 600, font: F.ui, color: "#fff", align: "center" }); ctx.restore(); }

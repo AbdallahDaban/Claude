@@ -1,65 +1,116 @@
-# Fleetana launch films: creative brief, brainstorm and scripts
+# Fleetana launch films: brief, process and final scripts
 
-## Ground rules (in priority order)
-1. **The code is the source of truth.** Every feature a film shows exists in `fleetana-master`. Colors, fonts and logo come from `app/globals.css`, `app/layout.tsx` and `public/*.svg`.
-2. **No invented numbers.** The code has no customer savings data. The films show *mechanisms* that save money. Every on-screen number is either a product rule from the code or plainly in-app example data:
-   - The fuel flag fires below 70% of a vehicle's 30-day average.
-   - VAT is 15%.
-   - Documents are flagged 30 days before expiry.
-   - Service is due on km, engine hours or date, whichever comes first.
-   - The map refreshes about every 10 s.
-   - Plans cost SAR 299 / SAR 899.
-3. **Don't repeat landing-page claims the code doesn't back:** sub-second latency, route optimisation, engine diagnostics and predictive maintenance.
-4. **GPS features need a tracker.** The live map, idling time and driver scores all depend on staff-provisioned GT06 trackers, so every tracker scene carries a "With a GPS tracker" tag.
-5. **Use the brand guide where the code is silent.** Its voice rules apply: plain, short, second person, no hype words. So do Saudi formats: plates with Arabic letters, SAR, km, DD/MM/YYYY.
+There are three films, each in English and Arabic, so six videos in total. They are in `out/`.
 
-## Visual identity, taken from the code
-- **Colors.** Brand blue `#2A89FA`. The dark "Deep Space" theme is base `#0F172A` with cards `#1E293B` and borders `#334155`, plus the marketing gradient `#0F172A` → `#060E20`.
-- **Map pins** use the app's own colors: moving green `#16A34A`, idling amber `#D97706`, parked slate `#475569`, no signal grey `#94A3B8`. The brand blue is never used for vehicle state.
-- **Type.** Hanken Grotesk for marketing headlines, Inter for UI, IBM Plex Sans Arabic for Arabic.
-- **Motion signature.** The landing page's kinetic background (particle network plus vertical data streams), made deterministic. The house ease is `cubic-bezier(0.16, 1, 0.3, 1)` from `hero-fade-in`.
-
-## Brainstorm: concepts considered
-
-| # | Concept | Verdict |
+| File | Format | Use it for |
 |---|---|---|
-| A | **"Off spreadsheets":** chaos (cells, receipts, sticky notes) is pulled into one Fleetana workspace | ✅ Film 1. This is the product's own CTA. |
-| B | **"Where the money leaks":** a riyal counter that keeps draining, with each leak plugged by a real feature | ✅ Film 2. This is the cost story you asked for. |
-| C | **Vertical "three checks before Sunday":** a fast phone-first social cut | ✅ Film 3. Snapchat, TikTok and Reels are where Saudi SMB owners scroll. |
-| D | A day in the life of a supervisor, with an actor and voiceover | ❌ Needs footage and a VO actor. A fake "real customer" would be dishonest. |
-| E | Savings calculator ("save 23%!") | ❌ No real data to back any percentage. |
-| F | AI and predictive-maintenance hype | ❌ Absent from the code, and banned by the brand voice. |
-| G | Truck "hero shots" with a cinematic 3D road | ⚠️ Partially folded into Film 1 and Film 2 as illustrated vehicles. |
+| `fleetana-film1-{en,ar}.mp4` | 40 s · 1920×1080 · 60 fps | Launch hero: website header, LinkedIn, YouTube, events |
+| `fleetana-film2-{en,ar}.mp4` | 30 s · 1920×1080 · 60 fps | Cost story: sales follow-ups, LinkedIn, X, pre-roll |
+| `fleetana-film3-{en,ar}.mp4` | 20 s · 1080×1920 · 60 fps | Vertical social: Snapchat, TikTok, Reels, Shorts, WhatsApp Status |
 
-## Film 1: "Off spreadsheets" (launch hero, 40 s, 16:9)
+Every frame is drawn in code, and the music and sound design are original, synthesized from scratch. There is no stock footage and no samples, so there are no licensing questions.
 
-| Time | Picture | Words |
-|---|---|---|
-| 0–5 | Cold open, dark. Spreadsheet cells, fuel receipts, a sticky note ("Oil change? ~85,000 km"), a chat bubble ("Istimara expired??") and a paper checklist pile up and jitter. | *Your fleet runs on spreadsheets, receipts and memory.* |
-| 5–8 | Everything is pulled into one point and the Fleetana mark assembles from two chevrons. The kinetic background breathes in. Wordmark. | — |
-| 8–11 | Headline | *One place for everything that touches your fleet.* |
-| 11–29 | Product tour: six 3 s beats, a tilted UI panel per module, rendered in the app's dark tokens | **Vehicles:** every vehicle, plate, driver and document date. **Service:** reminders by km, engine hours or date, whichever comes first. **Fuel:** every fill-up logged, and the ones that don't add up flagged. **Inspections:** a failed check opens an issue automatically. **Work orders:** parts, labour and 15% VAT, totalled in SAR. **Live map** (with a GPS tracker): moving, idling, parked, at a glance. |
-| 29–34 | "Built for Saudi fleets" chips: Istimara · Fahes · Insurance · SAR + VAT · km · العربية | *Built for Saudi fleets.* |
-| 34–40 | End card: logo, CTA, price | *Get your fleet off spreadsheets.* · fleetana.sa · *Plans from SAR 299 / month* |
+## Ground rules
 
-## Film 2: "Where the money leaks" (cost film, 30 s, 16:9)
+1. **The code is the source of truth.** Every feature shown exists in `fleetana-master`.
+   - Colors, fonts and the logo come from `app/globals.css`, `app/layout.tsx` and `public/*.svg`.
+   - UI labels are the app's own strings from `lib/i18n/*`.
+   - The brand guide (AI-drafted) was used only where the code is silent, for example the voice rules.
+2. **No invented numbers.** The code has no customer savings data, so the films show *mechanisms* that save money. Every number on screen is one of two things:
+   - **A product rule, quoted from the code:**
+     - a fuel fill is flagged below 70% of the vehicle's 30-day average (`lib/fuel-economy.ts`)
+     - VAT is 15%
+     - documents warn 30 days ahead
+     - service is due by km, engine hours or date
+     - driver-score bands (`lib/telematics/driver-score.ts`)
+   - **Plainly in-app example data:** plates, fuel logs, a work order.
+3. **No landing-page claims the code doesn't back.** The films avoid sub-second latency, route optimisation, engine diagnostics and predictive maintenance.
+4. **GPS features are tagged "Requires a GPS tracker".** This covers the live map, idle time and driver scores, because they depend on staff-provisioned GT06 trackers.
 
-| Time | Picture | Words |
-|---|---|---|
-| 0–3 | A large SAR figure ticking down. | *Fleets lose money quietly.* |
-| 3–8 | **Fuel.** A fuel log; one fill-up drops to 5.9 km/L against an average of 9.2. A red flag snaps on. | *Fuel that doesn't add up gets flagged.* (Rule: below 70% of the 30-day average) |
-| 8–13 | **Service.** An odometer rolls 89,420 → 90,000; the pill goes Upcoming → Due soon → Overdue. | *Service on time, before small jobs turn into big repairs.* |
-| 13–18 | **Papers.** Istimara, insurance and Fahes cards count down; "Expires in 12 days". | *Renew before the fine, not after.* |
-| 18–22 | **Idling** (GPS tracker). A map pin turns amber and an idle timer climbs. | *See which engines run while vehicles stand still.* |
-| 22–25 | **Warranty.** A work order line with the stamp "Under warranty · 143 days left". | *Don't pay for repairs still under warranty.* |
-| 25–30 | All five flags stack into the logo. | *Find the leaks. Fix them.* · Fleetana · fleetana.sa |
+## Process: brainstorm, critique, improve
 
-## Film 3: vertical social (20 s, 9:16)
+**Brainstorm.** Seven concepts were considered:
+- **Kept:** "off spreadsheets" (the app's own CTA), "where the money leaks", and a vertical social cut.
+- **Rejected:**
+  - a fake "real customer" day-in-the-life (dishonest without footage)
+  - a savings calculator (no data behind it)
+  - AI and predictive hype (absent from the code)
 
-| Time | Picture | Words |
-|---|---|---|
-| 0–2 | Hook. Big type. | *Still running your fleet on spreadsheets?* |
-| 2–16 | Phone-sized cards fly up, ~3.5 s each: Fuel flag · Service overdue · Istimara expiring · Failed inspection → issue opened | — |
-| 16–20 | Logo, CTA | *Get your fleet off spreadsheets.* · from SAR 299/month |
+**Critique round 1: scripts.** Two reviewers worked in parallel: a launch strategist fact-checking every line against the code, and a native Arabic copywriter.
 
-Each film renders in English and in natively drafted Arabic (right-to-left layout, Arabic UI strings taken from `lib/i18n/messages-ar.ts`). Music is original, synthesized per film.
+What changed:
+- "Service on time" became **"Service due by km, hours or date"**. Reminders don't push notifications, so the app tells you service is due but doesn't make it happen.
+- The warranty beat no longer says "143 days left". The app only shows *N days left* when 30 days or fewer remain, so it now shows **"active until 14/03/2027"** and **"Check before you pay"**. There is no claims workflow.
+- **The price was removed from the films.** The SAR 299 plan excludes inspections and work orders, which the films show.
+- The fuel flag is the app's **amber "Low" badge**, not red. The footnote **"Log the odometer. We flag the rest."** keeps it honest: only full fills with an odometer reading get an economy figure.
+- A driver-performance beat was added, which is strong for school and passenger fleets.
+- "2 trucks" became **"2 vehicles"**, because one of them is a Hilux pickup.
+
+**Critique round 2: rendered frames.** Two reviewers again: a senior art director, and a native Arabic editor with an RTL specialist eye.
+
+Art direction:
+- Film 1 opened with 8 s of no message. It now has the hook **"Your fleet runs on spreadsheets, receipts and memory."** and a tighter logo.
+- The proof moments (Low, Fail, totals, Overdue) were unreadable on a phone. Camera push-ins now hit each one, with a dark caption column.
+- Film 2's URL was on screen for about 0.1 s. The leaks were re-timed onto the 100 BPM grid, and the end card now holds for about 2.5 s.
+- Film 2 headlines now use one fixed size, back cards no longer clip their text, the chart labels are clear of the threshold line, and the odometer and card are aligned.
+- The Saudi scene was spaced out so the Kingdom Centre and Al Faisaliah silhouettes read, and the chips got contrast.
+- Smaller fixes: the map legend matches the pins, a stray spreadsheet column letter is gone, and Film 3's hook now pays off in the CTA ("spreadsheets").
+
+Arabic:
+- **"تُعلَّم / مُعلَّمة" (flagged)** reads as "is taught" without vowel marks. It is now the app's own term, **غير معتادة**, with captions like "تنبيه فوري" and "رصدناها".
+- **فليتانا is treated as masculine**, as in the app, so the line became **"صُمّم للأساطيل السعودية."**
+- **Initials such as "عمر ك."** rendered as "عمرك" ("your age"), so the drivers now have full family names.
+- **Plates** are isolated so they never split around Latin text, the checklist prop is right-to-left, the sticky note uses "حوالي 85,000 كم", and the percent sign is ٪.
+- **"البلاغات المُنشأة"** is ambiguous, because منشأة means "organization" in the app. It became **"بلاغات جديدة"**.
+- **Units:** UI mockups keep "km/L" and "SAR" exactly as the app's Arabic interface shows them, since code is truth. Film graphics and captions use كم, دقيقة and كم/لتر.
+
+## Final scripts (English)
+
+**Film 1 — "Off spreadsheets" (40 s).**
+- **0–5:** Spreadsheet chaos, a sticky note ("Oil change? ~85,000 km") and a chat ("Istimara expired??"). On screen: *Your fleet runs on spreadsheets, receipts and memory.*
+- **5–7:** Everything collapses into the mark, then the wordmark appears.
+- **7.2:** *Your whole fleet. One place.*
+- **9.6–32.7:** The product tour, one module per musical bar (3.3 s each), with a push-in on each beat's proof:
+  1. *Every plate, driver and document date.*
+  2. *Service due by km, hours or date.*
+  3. *Odd fill-ups get flagged.*
+  4. *Failed check? Issue opened.*
+  5. *Parts, labour, 15% VAT. Totalled.*
+  6. *Istimara, Fahes, insurance. 30 days' notice.*
+  7. *Moving, idle, parked. And how they drive.* (Requires a GPS tracker)
+- **32.7:** *Built for Saudi fleets.* Chips: Istimara · Fahes · Insurance · SAR + 15% VAT · km & engine hours · العربية. Fleet vehicles drive past a Riyadh skyline.
+- **35.3:** Logo · *Get your fleet off spreadsheets.* · fleetana.sa
+
+**Film 2 — "Where the money leaks" (30 s).**
+- **Hook:** Receipts rain down. *Where does your fleet's money go?*
+- **01 Fuel:** a bar chart of the last five fills against the average and the 70% line. *5.9 km/L. Your usual: 9.2.* → **Flagged.**
+- **02 Service:** an odometer rolls past 90,000 and the reminder flips to Overdue. → **Know before it breaks.**
+- **03 Papers:** Istimara counts down to 12 days. → **Renew before it lapses.**
+- **04 Idling:** an amber pin and an idle timer, with a truck sitting with its engine running. → **See it, then fix it.** (Requires a GPS tracker)
+- **05 Warranty:** an "active until" stamp lands on the work order line. → **Check before you pay.**
+- **End:** the five icons converge into the logo. *Find the leaks. Fix them.* · fleetana.sa
+
+**Film 3 — vertical (20 s).**
+- **Hook:** *Fleet still on spreadsheets and WhatsApp?*
+- **Story cards:**
+  1. *Fuel fill flagged.*
+  2. *Service overdue: 2 vehicles.*
+  3. *Istimara: 12 days left.*
+  4. *Failed check → issue opened.*
+- **End:** *Get your fleet off spreadsheets.* · fleetana.sa
+
+The Arabic scripts are in `strings.js` (the `ar` block). They were written natively, not translated.
+
+## Flagged for your team, found in the code while doing this
+
+- The landing page claims things the code doesn't do: "sub-second latency", route optimisation, engine diagnostics and predictive maintenance (`lib/i18n/messages-en.ts`). The FAQ says "no hardware to install", but GPS needs trackers.
+- The pricing page's Enterprise CTA points to `sales@fleetana.com`, while the rest of the site uses `@fleetana.sa`.
+- The Arabic warranty string `daysLeftMany` reads "متبقي {n} يوم". It should be يومًا.
+- The landing hero stats "98.4%", "-14%" and "+8%" are hard-coded decoration, not measured data.
+
+## Rebuild
+```
+python3 score.py        # music → audio/
+./render_all.sh         # six mp4s → out/
+```
+To preview in a browser, open `film1.html` (add `?lang=ar` for Arabic) and click the canvas to play it with sound.

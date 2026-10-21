@@ -201,7 +201,8 @@ function spreadsheet(ctx, x, y, w, h, rows, t) {
   for (let cx = 40; cx < w; cx += 130) { ctx.beginPath(); ctx.moveTo(cx + 0.5, 0); ctx.lineTo(cx + 0.5, h); ctx.stroke(); }
   for (let ry = 30; ry < h; ry += 30) { ctx.beginPath(); ctx.moveTo(0, ry + 0.5); ctx.lineTo(w, ry + 0.5); ctx.stroke(); }
   ctx.font = `500 15px ${F.ui}`; ctx.fillStyle = "#334155"; ctx.textBaseline = "middle";
-  "ABCDEFGH".split("").forEach((c, i) => ctx.fillText(c, 40 + i * 130 + 60, 15));
+  "ABCDEFGH".slice(0, Math.ceil((w - 40) / 130)).split("").forEach((c, i) => ctx.fillText(c, 40 + i * 130 + 60, 15));
+  ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.clip();
   rows.forEach((r, i) => { ctx.fillStyle = "#64748b"; ctx.fillText(String(i + 1), 12, 45 + i * 30); r.forEach((c, j) => { ctx.fillStyle = c.startsWith("#") || c.startsWith("?") ? "#dc2626" : "#0f172a"; ctx.fillText(c, 48 + j * 130, 45 + i * 30); }); });
   ctx.restore();
 }
@@ -217,7 +218,8 @@ function sticky(ctx, x, y, rot, lines, color = "#fde68a") {
   ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
   ctx.shadowColor = "rgba(0,0,0,0.4)"; ctx.shadowBlur = 20; ctx.shadowOffsetY = 10; ctx.fillStyle = color; ctx.fillRect(0, 0, 230, 210);
   ctx.shadowColor = "transparent"; ctx.fillStyle = "rgba(0,0,0,0.06)"; ctx.fillRect(0, 0, 230, 26);
-  ctx.fillStyle = "#1f2937"; ctx.font = `600 24px "Comic Sans MS", ${F.ui}`; ctx.textAlign = "center";
+  const ar = lines.some(l => /[\u0600-\u06FF]/.test(l));
+  ctx.fillStyle = "#1f2937"; ctx.font = ar ? `600 26px ${F.ar}` : `600 24px "Comic Sans MS", ${F.ui}`; ctx.textAlign = "center"; ctx.direction = ar ? "rtl" : "ltr";
   lines.forEach((l, i) => ctx.fillText(l, 115, 80 + i * 40));
   ctx.restore();
 }
@@ -231,11 +233,13 @@ function chatBubble(ctx, x, y, rot, s, { rtl = false, time = "21:47" } = {}) {
   ctx.direction = "ltr"; ctx.textAlign = rtl ? "left" : "right"; ctx.fillStyle = "#8696a0"; ctx.font = `400 14px ${F.ui}`; ctx.fillText(time, rtl ? 16 : w - 16, 46);
   ctx.restore();
 }
-function paperChecklist(ctx, x, y, rot, items) {
+function paperChecklist(ctx, x, y, rot, rtl, items) {
   ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
   ctx.shadowColor = "rgba(0,0,0,0.4)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 10; ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, 260, 320);
   ctx.shadowColor = "transparent"; ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 2;
-  items.forEach((it, i) => { ctx.strokeRect(24, 40 + i * 52, 22, 22); ctx.fillStyle = "#475569"; ctx.font = `500 17px ${F.ui}`; ctx.fillText(it, 60, 58 + i * 52);
-    if (i % 2 === 0) { ctx.strokeStyle = "#1d4ed8"; ctx.beginPath(); ctx.moveTo(27, 52 + i * 52); ctx.lineTo(34, 60 + i * 52); ctx.lineTo(46, 40 + i * 52); ctx.stroke(); ctx.strokeStyle = "#94a3b8"; } });
+  const cbx = rtl ? 214 : 24;   // checkbox column sits on the reading-start side
+  items.forEach((it, i) => { ctx.strokeRect(cbx, 40 + i * 52, 22, 22); ctx.fillStyle = "#475569"; ctx.font = `500 17px ${rtl ? F.ar : F.ui}`;
+    ctx.direction = rtl ? "rtl" : "ltr"; ctx.textAlign = rtl ? "right" : "left"; ctx.fillText(it, rtl ? 200 : 60, 58 + i * 52);
+    if (i % 2 === 0) { ctx.strokeStyle = "#1d4ed8"; ctx.beginPath(); ctx.moveTo(cbx + 3, 52 + i * 52); ctx.lineTo(cbx + 10, 60 + i * 52); ctx.lineTo(cbx + 22, 40 + i * 52); ctx.stroke(); ctx.strokeStyle = "#94a3b8"; } });
   ctx.restore();
 }

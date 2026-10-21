@@ -3,7 +3,7 @@
 // service due by km/hours/date (lib/service-reminders.ts), documents expiring (dashboard, 30 days),
 // idle time from the tracker (lib/telematics/trips.ts), warranty "active until" (lib/warranty.ts).
 const W = 1920, H = 1080, DUR = 30;
-const LEAKS = [3.0, 8.4, 13.8, 18.6, 23.4, 27.0];    // start of each leak, then end card
+const LEAKS = [3.0, 7.8, 12.6, 17.4, 21.6, 26.4];   // on the 100 BPM grid (0.6 s beats)    // start of each leak, then end card
 const ICONS = ["fuel", "wrench", "calendar", "pin", "shield"];
 const HF = RTL ? F.ar : F.head;
 const DIR = RTL ? "rtl" : "ltr";
@@ -12,15 +12,15 @@ const ZX = RTL ? 100 : 980, ZW = 840;            // hero zone (right half; left 
 const AL = a => (RTL ? (a === "left" ? "right" : a === "right" ? "left" : a) : a);
 
 // big statement lines: line 1 lands, line 2 (resolution) lands in brand blue
-function statement(ctx, l1, l2, lt, t2, { y = 500, size = 92 } = {}) {
-  const x = X(140);
-  ctx.save(); ctx.font = `700 ${size}px ${HF}`; const fs = Math.min(size, size * 740 / Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width)); ctx.restore();
+function statement(ctx, l1, l2, lt, t2, { y = 500, size = RTL ? 72 : 76 } = {}) {
+  const x = X(110);
+  ctx.save(); ctx.font = `700 ${size}px ${HF}`; const fs = Math.min(size, size * 800 / Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width)); ctx.restore();
   riseText(ctx, l1, x, y, seg(lt, 0.15, 0.85), { size: fs, weight: 700, font: HF, color: C.heading, align: AL("left"), dir: DIR, track: RTL ? 0 : -1.5 });
   riseText(ctx, l2, x, y + fs * 1.22, seg(lt, t2, t2 + 0.6), { size: fs, weight: 700, font: HF, color: C.brand, align: AL("left"), dir: DIR, track: RTL ? 0 : -1.5 });
 }
 // leak counter: 01 / 05 + label, plus five progress ticks
 function counter(ctx, i, lt) {
-  const k = E.hero(seg(lt, 0, 0.5)), x = X(140);
+  const k = E.hero(seg(lt, 0, 0.5)), x = X(110);
   ctx.save(); ctx.globalAlpha *= k;
   text(ctx, `0${i + 1}`, x, 330, { size: 22, weight: 600, font: F.mono, color: C.brand, align: AL("left") });
   text(ctx, S.f2.leak[i], RTL ? x - 54 : x + 54, 330, { size: 22, weight: 600, font: RTL ? F.ar : F.ui, color: C.onVariant, align: AL("left"), dir: DIR });
@@ -67,11 +67,11 @@ function leakFuel(ctx, lt, t) {
   const cw = 104, gap = 30, gutter = 150, x0 = RTL ? b.x + gutter : b.x + 50;
   // average + threshold lines
   const ly = v => base - v * sc, lk = E.hero(seg(lt, 0.9, 1.5));
-  ctx.strokeStyle = "rgba(148,163,184,0.6)"; ctx.lineWidth = 2; ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(b.x + 30, ly(avg)); ctx.lineTo(b.x + 30 + (b.w - 60 - gutter) * lk + (RTL ? gutter : 0), ly(avg)); ctx.stroke();
-  ctx.strokeStyle = rgba("#f59e0b", 0.9); ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.moveTo(b.x + 30, ly(thr)); ctx.lineTo(b.x + 30 + (b.w - 60 - gutter) * lk + (RTL ? gutter : 0), ly(thr)); ctx.stroke(); ctx.setLineDash([]);
+  ctx.strokeStyle = "rgba(148,163,184,0.6)"; ctx.lineWidth = 2; ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(b.x + 30 + (RTL ? gutter : 0), ly(avg)); ctx.lineTo(b.x + 30 + (b.w - 60 - gutter) * lk + (RTL ? gutter : 0), ly(avg)); ctx.stroke();
+  ctx.strokeStyle = rgba("#f59e0b", 0.9); ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.moveTo(b.x + 30 + (RTL ? gutter : 0), ly(thr)); ctx.lineTo(b.x + 30 + (b.w - 60 - gutter) * lk + (RTL ? gutter : 0), ly(thr)); ctx.stroke(); ctx.setLineDash([]);
   ctx.save(); ctx.globalAlpha *= lk;
-  bn(ctx, b, `avg 9.2`, b.w - 30, ly(avg) - b.y + 7, { size: 20, weight: 600, color: C.onVariant, align: "right", font: F.mono });
-  bn(ctx, b, `70% 6.4`, b.w - 30, ly(thr) - b.y + 7, { size: 20, weight: 600, color: "#fbbf24", align: "right", font: F.mono });
+  bt(ctx, b, `${S.u.avg} 9.2`, b.w - 30, ly(avg) - b.y + 7, { size: 20, weight: 600, color: C.onVariant, align: "right", font: F.mono });
+  bt(ctx, b, `${S.u.thr} 6.4`, b.w - 30, ly(thr) - b.y + 7, { size: 20, weight: 600, color: "#fbbf24", align: "right", font: F.mono });
   ctx.restore();
   vals.forEach((v, i) => {
     const gk = E.outCubic(seg(lt, 0.5 + i * 0.12, 1.1 + i * 0.12)), last = i === 4;
@@ -80,13 +80,13 @@ function leakFuel(ctx, lt, t) {
     const low = last && shown < thr;
     ctx.fillStyle = low ? "#D97706" : last ? C.brand : "rgba(42,137,250,0.45)";
     rr(ctx, x, base - hgt, cw, hgt, 8); ctx.fill();
-    if (gk > 0.5) text(ctx, shown.toFixed(1), x + cw / 2, base - hgt - 16, { size: 28, weight: 700, font: F.ui, color: low ? "#fbbf24" : C.fg, align: "center" });
-    if (low) { const pk = E.outBack(seg(lt, 2.3, 2.7)); if (pk > 0) { ctx.save(); ctx.globalAlpha *= clamp(pk); statusPill(ctx, x + cw / 2, base - hgt - 70, S.low, "warn", { size: 20, rtl: RTL, align: "center", dot: false }); ctx.restore(); } }
+    if (gk > 0.5) text(ctx, shown.toFixed(1), x + cw / 2, base - hgt - (last ? 34 : 16), { size: 28, weight: 700, font: F.ui, color: low ? "#fbbf24" : C.fg, align: "center" });
+    if (low) { const pk = E.outBack(seg(lt, 2.3, 2.7)); if (pk > 0) { ctx.save(); ctx.globalAlpha *= clamp(pk); statusPill(ctx, x + cw / 2, base - hgt - 86, S.low, "warn", { size: 20, rtl: RTL, align: "center", dot: false }); ctx.restore(); } }
   });
   ctx.fillStyle = C.border; ctx.fillRect(b.x + 30, base, b.w - 60, 2);
   ctx.restore();
-  const fk = E.hero(seg(lt, 3.1, 3.7));
-  text(ctx, S.f2.fuelFoot, X(140), 760, { size: 28, weight: 500, font: RTL ? F.ar : F.ui, color: C.muted, align: AL("left"), alpha: fk, dir: DIR });
+  const fk = E.hero(seg(lt, 2.7, 3.2));
+  text(ctx, S.f2.fuelFoot, X(110), 760, { size: RTL ? 36 : 38, weight: 500, font: RTL ? F.ar : F.ui, color: C.onVariant, align: AL("left"), alpha: fk, dir: DIR });
 }
 
 // ── 2: service — rolling odometer, reminder flips to Overdue ───────────────
@@ -104,15 +104,15 @@ function odometer(ctx, cx, cy, value, digits = 6, s = 1) {
     const g = ctx.createLinearGradient(0, cy - dh / 2, 0, cy + dh / 2); g.addColorStop(0, "rgba(11,19,38,0.85)"); g.addColorStop(0.3, "rgba(11,19,38,0)"); g.addColorStop(0.7, "rgba(11,19,38,0)"); g.addColorStop(1, "rgba(11,19,38,0.85)");
     ctx.fillStyle = g; ctx.fillRect(x, cy - dh / 2, dw, dh); ctx.restore();
   }
-  text(ctx, "km", cx + w / 2 + 40 * s, cy + 22 * s, { size: 34 * s, weight: 600, font: F.ui, color: C.muted });
+  text(ctx, S.u.km, cx + w / 2 + 40 * s, cy + 22 * s, { size: 34 * s, weight: 600, font: RTL ? F.ar : F.ui, color: C.muted });
   ctx.restore();
 }
 function leakService(ctx, lt) {
-  counter(ctx, 1, lt); statement(ctx, S.f2.svc1, S.f2.svc2, lt, 2.6);
+  counter(ctx, 1, lt); statement(ctx, S.f2.svc1, S.f2.svc2, lt, 2.2);
   const k = E.hero(seg(lt, 0.3, 1.0)); if (k <= 0) return;
   const km = lerp(89420, 90060, E.inOutCubic(seg(lt, 0.6, 2.2)));
   ctx.save(); ctx.globalAlpha *= k; ctx.translate(0, (1 - k) * 60);
-  odometer(ctx, ZX + ZW / 2 - 30, 380, km, 6, 1.2);
+  odometer(ctx, RTL ? ZX + 330 : ZX + ZW - 360, 410, km, 6, 1.2);
   // reminder card
   const b = { x: ZX, y: 590, w: ZW, h: 220, rtl: RTL };
   card(ctx, b.x, b.y, b.w, b.h, { fill: C.card, stroke: C.border, r: 16 });
@@ -129,12 +129,13 @@ function leakService(ctx, lt) {
 }
 
 // ── 3: papers — Istimara card counts down ───────────────────────────────────
-function docCard(ctx, x, y, w, h, title, sub, date, n, kind, rot) {
+function docCard(ctx, x, y, w, h, title, sub, date, n, kind, rot, back = false) {
   ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(rot); ctx.translate(-w / 2, -h / 2);
   card(ctx, 0, 0, w, h, { fill: "#16213a", stroke: C.border, r: 18 });
   const b = { x: 0, y: 0, w, rtl: RTL };
   ctx.fillStyle = rgba(C.brand, 0.9); ctx.fillRect(RTL ? w - 10 : 0, 24, 10, 60);
   bt(ctx, b, title, 36, 64, { size: 36, weight: 700, color: C.fg });
+  if (back) { statusPill(ctx, bx(b, w - 32), 56, S.inDays(n), kind, { size: 20, rtl: RTL, align: "right" }); ctx.restore(); return; }
   bn(ctx, b, sub, 36, 104, { size: 20, weight: 500, color: C.muted });
   bt(ctx, b, S.expiringSoon, 36, h - 70, { size: 18, weight: 500, color: C.muted });
   bn(ctx, b, date, 36, h - 34, { size: 30, weight: 600, color: C.fg, font: F.mono });
@@ -142,7 +143,7 @@ function docCard(ctx, x, y, w, h, title, sub, date, n, kind, rot) {
   ctx.restore();
 }
 function leakPapers(ctx, lt) {
-  counter(ctx, 2, lt); statement(ctx, S.f2.doc1, S.f2.doc2, lt, 2.3);
+  counter(ctx, 2, lt); statement(ctx, S.f2.doc1, S.f2.doc2, lt, 2.0);
   const docs = [[S.docFahes, FLEET[2], "16/11/2026", 26, "warn"], [S.docInsurance, FLEET[4], "09/11/2026", 19, "warn"], [S.docIstimara, FLEET[1], "02/11/2026", 12, "bad"]];
   const cx = ZX + ZW / 2;
   docs.forEach((d, i) => {
@@ -150,14 +151,14 @@ function leakPapers(ctx, lt) {
     const fan = (i - 2) * 0.025 * (RTL ? -1 : 1), off = (i - 2) * 100;
     const n = i === 2 ? Math.round(lerp(30, 12, E.inOutCubic(seg(lt, 1.0, 2.0)))) : d[3];
     ctx.save(); ctx.globalAlpha *= k; ctx.translate((RTL ? -1 : 1) * (1 - k) * 200, 0);
-    docCard(ctx, cx - 400 - off * 0.25 * (RTL ? -1 : 1), 470 + off, 800, 340, d[0], `${d[1].model} · ${d[1].plate}`, d[2], n, n <= 14 ? "bad" : "warn", fan + (1 - k) * 0.2);
+    docCard(ctx, cx - 400 - off * 0.25 * (RTL ? -1 : 1), 470 + off, 800, 340, d[0], `${d[1].model} · ${d[1].plate}`, d[2], n, n <= 14 ? "bad" : "warn", fan + (1 - k) * 0.2, i < 2);
     ctx.restore();
   });
 }
 
 // ── 4: idling — parked truck, engine running, amber pin, idle time ─────────
 function leakIdle(ctx, lt, t) {
-  counter(ctx, 3, lt); statement(ctx, S.f2.idle1, S.f2.idle2, lt, 2.4);
+  counter(ctx, 3, lt); statement(ctx, S.f2.idle1, S.f2.idle2, lt, 1.7);
   const k = E.hero(seg(lt, 0.25, 1.0)); if (k <= 0) return;
   ctx.save(); ctx.globalAlpha *= k; ctx.translate(0, (1 - k) * 60);
   const mb = { x: ZX, y: 210, w: ZW, h: 560, r: 18 };
@@ -172,7 +173,7 @@ function leakIdle(ctx, lt, t) {
   statusPill(ctx, bx(pb, pb.w - 24), pb.y + 40, S.idle, "warn", { size: 16, rtl: RTL, align: "right" });
   bt(ctx, pb, S.idleTime, 24, 92, { size: 17, weight: 500, color: C.muted });
   const mins = Math.round(lerp(12, 41, E.outCubic(seg(lt, 0.8, 2.6))));
-  bn(ctx, pb, `${mins} min`, 24, 132, { size: 34, weight: 700, color: "#fbbf24" });
+  bt(ctx, pb, `${mins} ${S.u.min}`, 24, 132, { size: 34, weight: 700, color: "#fbbf24" });
   // tracker tag
   statusPill(ctx, RTL ? mb.x + mb.w - 24 : mb.x + 24, mb.y + mb.h - 40, S.f1.tracker, "info", { size: 17, rtl: RTL });
   ctx.restore();
@@ -187,7 +188,7 @@ function leakIdle(ctx, lt, t) {
 
 // ── 5: warranty — "active until" stamp lands on the line ───────────────────
 function leakWarranty(ctx, lt) {
-  counter(ctx, 4, lt); statement(ctx, S.f2.war1, S.f2.war2, lt, 1.9, { size: 80 });
+  counter(ctx, 4, lt); statement(ctx, S.f2.war1, S.f2.war2, lt, 1.5);
   const k = E.hero(seg(lt, 0.25, 0.9)); if (k <= 0) return;
   const b = { x: ZX, y: 380, w: ZW, h: 320, rtl: RTL };
   ctx.save(); ctx.globalAlpha *= k; ctx.translate(0, (1 - k) * 60);
@@ -231,11 +232,11 @@ function endCard(ctx, t) {
   if (u > 0.9) drawLogo(ctx, W / 2 - lw / 2, 350, lh, C.brand, seg(u, 0.9, 1.9));
   S.f2.end.forEach((l, i) => riseText(ctx, l, W / 2, 600 + i * 100, seg(u, 1.1 + i * 0.25, 1.8 + i * 0.25),
     { size: RTL ? 76 : 82, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
-  const bk = E.hero(seg(u, 1.8, 2.4));
+  const bk = E.hero(seg(u, 1.4, 1.9));
   if (bk > 0) { ctx.save(); ctx.globalAlpha *= bk; ctx.font = `600 30px ${F.ui}`; const w = ctx.measureText(S.url).width + 80;
     rr(ctx, W / 2 - w / 2, 800, w, 68, 34); ctx.fillStyle = C.brand; ctx.fill();
     text(ctx, S.url, W / 2, 845, { size: 30, weight: 600, font: F.ui, color: "#fff", align: "center" }); ctx.restore(); }
-  const fo = seg(t, DUR - 0.5, DUR); if (fo > 0) { ctx.fillStyle = `rgba(6,14,32,${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
+  const fo = seg(t, DUR - 0.4, DUR); if (fo > 0) { ctx.fillStyle = `rgba(6,14,32,${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
 }
 
 film({
