@@ -201,7 +201,7 @@ function spreadsheet(ctx, x, y, w, h, rows, t) {
   for (let cx = 40; cx < w; cx += 130) { ctx.beginPath(); ctx.moveTo(cx + 0.5, 0); ctx.lineTo(cx + 0.5, h); ctx.stroke(); }
   for (let ry = 30; ry < h; ry += 30) { ctx.beginPath(); ctx.moveTo(0, ry + 0.5); ctx.lineTo(w, ry + 0.5); ctx.stroke(); }
   ctx.font = `500 15px ${F.ui}`; ctx.fillStyle = "#334155"; ctx.textBaseline = "middle";
-  "ABCDEFGH".slice(0, Math.ceil((w - 40) / 130)).split("").forEach((c, i) => ctx.fillText(c, 40 + i * 130 + 60, 15));
+  "ABCDEFGH".slice(0, Math.ceil((w - 100) / 130)).split("").forEach((c, i) => ctx.fillText(c, 40 + i * 130 + 60, 15));
   ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.clip();
   rows.forEach((r, i) => { ctx.fillStyle = "#64748b"; ctx.fillText(String(i + 1), 12, 45 + i * 30); r.forEach((c, j) => { ctx.fillStyle = c.startsWith("#") || c.startsWith("?") ? "#dc2626" : "#0f172a"; ctx.fillText(c, 48 + j * 130, 45 + i * 30); }); });
   ctx.restore();

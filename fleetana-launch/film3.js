@@ -34,8 +34,9 @@ function hook(ctx, t) {
   const chats = RTL ? ["وين فاتورة الديزل؟", "الكفر الخلفي فيه شي", "متى صيانة الهايس؟"] : ["Where's the diesel receipt?", "Rear tyre looks bad", "When is the Hiace due?"];
   chats.forEach((c, i) => { const k = E.outBack(seg(t, 0.35 + i * 0.28, 0.75 + i * 0.28)); if (k <= 0) return;
     ctx.save(); ctx.globalAlpha *= clamp(k); ctx.translate(RTL ? 760 - i * 100 : 240 + i * 90, 1420 + i * 130); ctx.scale(1.7 * k, 1.7 * k); chatBubble(ctx, -110, 0, (i - 1) * 0.04, c, { rtl: RTL, time: `22:${String(14 + i * 7)}` }); ctx.restore(); });
-  S.f3.hook.forEach((l, i) => riseText(ctx, l, W / 2, 620 + i * 120, seg(t, 0.2 + i * 0.22, 0.95 + i * 0.22),
-    { size: RTL ? 92 : 100, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
+  ctx.font = `700 100px ${HF}`; const hs = Math.min(RTL ? 92 : 100, 100 * 960 / Math.max(...S.f3.hook.map(l => ctx.measureText(l).width)));
+  S.f3.hook.forEach((l, i) => riseText(ctx, l, W / 2, 620 + i * hs * 1.2, seg(t, 0.2 + i * 0.22, 0.95 + i * 0.22),
+    { size: hs, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
   ctx.restore();
 }
 
