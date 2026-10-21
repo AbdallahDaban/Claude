@@ -16,15 +16,15 @@ function statement(ctx, l1, l2, lt, t2, { y = 500, size = RTL ? 72 : 76 } = {}) 
   const x = X(110);
   ctx.save(); ctx.font = `700 ${size}px ${HF}`; const fs = Math.min(size, size * 800 / Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width)); ctx.restore();
   riseText(ctx, l1, x, y, seg(lt, 0.15, 0.85), { size: fs, weight: 700, font: HF, color: C.heading, align: AL("left"), dir: DIR, track: RTL ? 0 : -1.5 });
-  riseText(ctx, l2, x, y + fs * 1.22, seg(lt, t2, t2 + 0.6), { size: fs, weight: 700, font: HF, color: C.brand, align: AL("left"), dir: DIR, track: RTL ? 0 : -1.5 });
+  riseText(ctx, l2, x, y + fs * 1.22, seg(lt, t2, t2 + 0.6), { size: fs, weight: 700, font: HF, color: C.accentText, align: AL("left"), dir: DIR, track: RTL ? 0 : -1.5 });
 }
 // leak counter: 01 / 05 + label, plus five progress ticks
 function counter(ctx, i, lt) {
   const k = E.hero(seg(lt, 0, 0.5)), x = X(110);
   ctx.save(); ctx.globalAlpha *= k;
-  text(ctx, `0${i + 1}`, x, 330, { size: 22, weight: 600, font: F.mono, color: C.brand, align: AL("left") });
+  text(ctx, `0${i + 1}`, x, 330, { size: 22, weight: 600, font: F.mono, color: C.accentText, align: AL("left") });
   text(ctx, S.f2.leak[i], RTL ? x - 54 : x + 54, 330, { size: 22, weight: 600, font: RTL ? F.ar : F.ui, color: C.onVariant, align: AL("left"), dir: DIR });
-  for (let j = 0; j < 5; j++) { ctx.fillStyle = j <= i ? C.brand : "rgba(148,163,184,0.25)"; ctx.fillRect(RTL ? x - 40 - j * 52 : x + j * 52, 352, 40, 4); }
+  for (let j = 0; j < 5; j++) { ctx.fillStyle = j <= i ? C.brand : C.inactive; ctx.fillRect(RTL ? x - 40 - j * 52 : x + j * 52, 352, 40, 4); }
   ctx.restore();
 }
 function enterExit(ctx, t, a, b, fn) { // shared in/out for a leak block
@@ -43,14 +43,14 @@ function hook(ctx, t) {
   RECEIPTS.forEach(r => {
     const k = seg(t, r.d, r.d + 1.6); if (k <= 0) return;
     const y = lerp(-420, 1300, E.inCubic(k) * 0.55 + k * 0.45);
-    ctx.save(); ctx.globalAlpha *= 0.55; ctx.translate(r.x, y); ctx.scale(r.s, r.s); receipt(ctx, -110, 0, r.rot + k * 0.4 * Math.sign(r.rot), r.lines); ctx.restore();
+    ctx.save(); ctx.globalAlpha *= THEME === "light" ? 0.95 : 0.55; ctx.translate(r.x, y); ctx.scale(r.s, r.s); receipt(ctx, -110, 0, r.rot + k * 0.4 * Math.sign(r.rot), r.lines); ctx.restore();
   });
   const dim = ctx.createRadialGradient(W / 2, H / 2, 100, W / 2, H / 2, 900);
-  dim.addColorStop(0, "rgba(6,14,32,0.85)"); dim.addColorStop(1, "rgba(6,14,32,0.2)"); ctx.fillStyle = dim; ctx.fillRect(0, 0, W, H);
+  dim.addColorStop(0, `rgba(${C.fadeRGB},${THEME === "light" ? 0.8 : 0.85})`); dim.addColorStop(1, `rgba(${C.fadeRGB},${THEME === "light" ? 0 : 0.2})`); ctx.fillStyle = dim; ctx.fillRect(0, 0, W, H);
   const out = E.inOutExpo(seg(t, 2.65, 3.0));
   ctx.save(); ctx.globalAlpha *= 1 - out; ctx.translate(0, -out * 80);
   S.f2.hook.forEach((l, i) => riseText(ctx, l, W / 2, 500 + i * 128, seg(t, 0.35 + i * 0.25, 1.15 + i * 0.25),
-    { size: RTL ? 112 : 118, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2.5 }));
+    { size: RTL ? 112 : 118, weight: 700, font: HF, color: i ? C.accentText : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2.5 }));
   ctx.restore();
 }
 
@@ -71,7 +71,7 @@ function leakFuel(ctx, lt, t) {
   ctx.strokeStyle = rgba("#f59e0b", 0.9); ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.moveTo(b.x + 30 + (RTL ? gutter : 0), ly(thr)); ctx.lineTo(b.x + 30 + (b.w - 60 - gutter) * lk + (RTL ? gutter : 0), ly(thr)); ctx.stroke(); ctx.setLineDash([]);
   ctx.save(); ctx.globalAlpha *= lk;
   bt(ctx, b, `${S.u.avg} 9.2`, b.w - 30, ly(avg) - b.y + 7, { size: 20, weight: 600, color: C.onVariant, align: "right", font: F.mono });
-  bt(ctx, b, `${S.u.thr} 6.4`, b.w - 30, ly(thr) - b.y + 7, { size: 20, weight: 600, color: "#fbbf24", align: "right", font: F.mono });
+  bt(ctx, b, `${S.u.thr} 6.4`, b.w - 30, ly(thr) - b.y + 7, { size: 20, weight: 600, color: C.amber, align: "right", font: F.mono });
   ctx.restore();
   vals.forEach((v, i) => {
     const gk = E.outCubic(seg(lt, 0.5 + i * 0.12, 1.1 + i * 0.12)), last = i === 4;
@@ -80,7 +80,7 @@ function leakFuel(ctx, lt, t) {
     const low = last && shown < thr;
     ctx.fillStyle = low ? "#D97706" : last ? C.brand : "rgba(42,137,250,0.45)";
     rr(ctx, x, base - hgt, cw, hgt, 8); ctx.fill();
-    if (gk > 0.5) text(ctx, shown.toFixed(1), x + cw / 2, base - hgt - (last ? 34 : 16), { size: 28, weight: 700, font: F.ui, color: low ? "#fbbf24" : C.fg, align: "center" });
+    if (gk > 0.5) text(ctx, shown.toFixed(1), x + cw / 2, base - hgt - (last ? 34 : 16), { size: 28, weight: 700, font: F.ui, color: low ? C.amber : C.fg, align: "center" });
     if (low) { const pk = E.outBack(seg(lt, 2.3, 2.7)); if (pk > 0) { ctx.save(); ctx.globalAlpha *= clamp(pk); statusPill(ctx, x + cw / 2, base - hgt - 86, S.low, "warn", { size: 20, rtl: RTL, align: "center", dot: false }); ctx.restore(); } }
   });
   ctx.fillStyle = C.border; ctx.fillRect(b.x + 30, base, b.w - 60, 2);
@@ -92,16 +92,16 @@ function leakFuel(ctx, lt, t) {
 // ── 2: service — rolling odometer, reminder flips to Overdue ───────────────
 function odometer(ctx, cx, cy, value, digits = 6, s = 1) {
   const dw = 78 * s, dh = 118 * s, w = dw * digits;
-  ctx.save(); card(ctx, cx - w / 2 - 18 * s, cy - dh / 2 - 18 * s, w + 36 * s, dh + 36 * s, { fill: "#0b1326", stroke: C.border, r: 16 * s });
+  ctx.save(); card(ctx, cx - w / 2 - 18 * s, cy - dh / 2 - 18 * s, w + 36 * s, dh + 36 * s, { fill: C.well, stroke: C.border, r: 16 * s });
   for (let i = 0; i < digits; i++) {
     const place = Math.pow(10, digits - 1 - i), raw = value / place, d = Math.floor(raw) % 10;
     // only roll when lower digits are about to carry, like a mechanical counter
     const lower = value % place, roll = place === 1 ? fract(raw) : clamp((lower - (place - 1)) / 1), off = (place === 1 ? fract(value) : roll);
     const x = cx - w / 2 + i * dw;
-    ctx.save(); rr(ctx, x + 4 * s, cy - dh / 2, dw - 8 * s, dh, 8 * s); ctx.fillStyle = i >= digits - 3 ? "#16213a" : "#111a2e"; ctx.fill(); ctx.clip();
+    ctx.save(); rr(ctx, x + 4 * s, cy - dh / 2, dw - 8 * s, dh, 8 * s); ctx.fillStyle = i >= digits - 3 ? C.wellHi : C.wellLo; ctx.fill(); ctx.clip();
     ctx.font = `600 ${86 * s}px ${F.mono}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillStyle = C.fg;
     ctx.fillText(String(d), x + dw / 2, cy - off * dh); ctx.fillText(String((d + 1) % 10), x + dw / 2, cy + dh - off * dh);
-    const g = ctx.createLinearGradient(0, cy - dh / 2, 0, cy + dh / 2); g.addColorStop(0, "rgba(11,19,38,0.85)"); g.addColorStop(0.3, "rgba(11,19,38,0)"); g.addColorStop(0.7, "rgba(11,19,38,0)"); g.addColorStop(1, "rgba(11,19,38,0.85)");
+    const g = ctx.createLinearGradient(0, cy - dh / 2, 0, cy + dh / 2); g.addColorStop(0, `rgba(${C.wellRGB},0.85)`); g.addColorStop(0.3, `rgba(${C.wellRGB},0)`); g.addColorStop(0.7, `rgba(${C.wellRGB},0)`); g.addColorStop(1, `rgba(${C.wellRGB},0.85)`);
     ctx.fillStyle = g; ctx.fillRect(x, cy - dh / 2, dw, dh); ctx.restore();
   }
   text(ctx, S.u.km, cx + w / 2 + 40 * s, cy + 22 * s, { size: 34 * s, weight: 600, font: RTL ? F.ar : F.ui, color: C.muted });
@@ -121,7 +121,7 @@ function leakService(ctx, lt) {
   bn(ctx, b, `${FLEET[0].model} · ${FLEET[0].plate}`, 92, 100, { size: 19, weight: 500, color: C.muted });
   const prog = clamp((km - 80000) / 10000), st = km >= 90000 ? ["overdue", "bad"] : km >= 89000 ? ["dueSoon", "warn"] : ["upcoming", "muted"];
   statusPill(ctx, bx(b, b.w - 34), b.y + 64, S[st[0]], st[1], { size: 20, rtl: RTL, align: "right" });
-  ctx.fillStyle = "rgba(51,65,85,0.7)"; rr(ctx, b.x + 34, b.y + 140, b.w - 68, 14, 7); ctx.fill();
+  ctx.fillStyle = C.track; rr(ctx, b.x + 34, b.y + 140, b.w - 68, 14, 7); ctx.fill();
   ctx.fillStyle = PILLS[st[1] === "muted" ? "info" : st[1]].dot; const pw = (b.w - 68) * Math.min(1, prog);
   rr(ctx, RTL ? b.x + b.w - 34 - pw : b.x + 34, b.y + 140, pw, 14, 7); ctx.fill();
   bn(ctx, b, "90,000 km", b.w - 34, 182, { size: 17, weight: 600, color: C.onVariant, align: "right", font: F.mono });
@@ -131,7 +131,7 @@ function leakService(ctx, lt) {
 // ── 3: papers — Istimara card counts down ───────────────────────────────────
 function docCard(ctx, x, y, w, h, title, sub, date, n, kind, rot, back = false) {
   ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(rot); ctx.translate(-w / 2, -h / 2);
-  card(ctx, 0, 0, w, h, { fill: "#16213a", stroke: C.border, r: 18 });
+  card(ctx, 0, 0, w, h, { fill: C.panel, stroke: C.border, r: 18 });
   const b = { x: 0, y: 0, w, rtl: RTL };
   ctx.fillStyle = rgba(C.brand, 0.9); ctx.fillRect(RTL ? w - 10 : 0, 24, 10, 60);
   bt(ctx, b, title, 36, 64, { size: 36, weight: 700, color: C.fg });
@@ -168,12 +168,12 @@ function leakIdle(ctx, lt, t) {
   mapPin(ctx, px, py, "idling", 1.6, { pulse: fract(lt * 0.9) });
   // idle-time panel (fleet-map shows idle per trip / per day)
   const pb = { x: RTL ? mb.x + 30 : mb.x + mb.w - 30 - 330, y: mb.y + 30, w: 330, rtl: RTL };
-  card(ctx, pb.x, pb.y, pb.w, 150, { fill: "rgba(15,23,42,0.95)", stroke: C.border, r: 14 });
+  card(ctx, pb.x, pb.y, pb.w, 150, { fill: C.overlay, stroke: C.border, r: 14 });
   bn(ctx, pb, FLEET[2].plate, 24, 44, { size: 22, weight: 600, color: C.fg, font: F.mono });
   statusPill(ctx, bx(pb, pb.w - 24), pb.y + 40, S.idle, "warn", { size: 16, rtl: RTL, align: "right" });
   bt(ctx, pb, S.idleTime, 24, 92, { size: 17, weight: 500, color: C.muted });
   const mins = Math.round(lerp(12, 41, E.outCubic(seg(lt, 0.8, 2.6))));
-  bt(ctx, pb, `${mins} ${S.u.min}`, 24, 132, { size: 34, weight: 700, color: "#fbbf24" });
+  bt(ctx, pb, `${mins} ${S.u.min}`, 24, 132, { size: 34, weight: 700, color: C.amber });
   // tracker tag
   statusPill(ctx, RTL ? mb.x + mb.w - 24 : mb.x + 24, mb.y + mb.h - 40, S.f1.tracker, "info", { size: 17, rtl: RTL });
   ctx.restore();
@@ -182,7 +182,7 @@ function leakIdle(ctx, lt, t) {
   ctx.save(); ctx.globalAlpha *= k;
   if (RTL) { ctx.translate(2 * tx + 620 * 0.85, 0); ctx.scale(-1, 1); }
   vehicle(ctx, "truck", tx, ty, 0.85, { t, moving: false });
-  for (let i = 0; i < 6; i++) { const ph = fract(lt * 0.9 + i / 6); ctx.fillStyle = `rgba(203,213,225,${0.28 * (1 - ph)})`; ctx.beginPath(); ctx.arc(tx - 10 - ph * 90, ty + 140 - ph * 80, 10 + ph * 26, 0, TAU); ctx.fill(); }
+  for (let i = 0; i < 6; i++) { const ph = fract(lt * 0.9 + i / 6); ctx.fillStyle = `rgba(${C.puffRGB},${0.28 * (1 - ph)})`; ctx.beginPath(); ctx.arc(tx - 10 - ph * 90, ty + 140 - ph * 80, 10 + ph * 26, 0, TAU); ctx.fill(); }
   ctx.restore();
 }
 
@@ -207,9 +207,9 @@ function leakWarranty(ctx, lt) {
     const lbl = `${S.warranty} · ${S.activeUntil("14/03/2027")}`;
     ctx.font = `600 26px ${RTL ? F.ar : F.ui}`; const w = ctx.measureText(lbl).width + 84;
     const px = RTL ? sx - w : sx;
-    rr(ctx, px, sy - 30, w, 60, 30); ctx.fillStyle = "rgba(22,163,74,0.16)"; ctx.fill(); ctx.strokeStyle = "rgba(74,222,128,0.6)"; ctx.lineWidth = 2; ctx.stroke();
-    icon(ctx, "shield", RTL ? px + w - 50 : px + 20, sy - 15, 30, "#4ade80", 2.2);
-    text(ctx, lbl, RTL ? px + w - 62 : px + 62, sy + 9, { size: 26, weight: 600, font: RTL ? F.ar : F.ui, color: "#4ade80", align: AL("left"), dir: DIR });
+    rr(ctx, px, sy - 30, w, 60, 30); ctx.fillStyle = "rgba(22,163,74,0.16)"; ctx.fill(); ctx.strokeStyle = C.greenLine; ctx.lineWidth = 2; ctx.stroke();
+    icon(ctx, "shield", RTL ? px + w - 50 : px + 20, sy - 15, 30, C.green, 2.2);
+    text(ctx, lbl, RTL ? px + w - 62 : px + 62, sy + 9, { size: 26, weight: 600, font: RTL ? F.ar : F.ui, color: C.green, align: AL("left"), dir: DIR });
     ctx.restore();
   }
   ctx.restore();
@@ -231,12 +231,12 @@ function endCard(ctx, t) {
   const lh = 88, lw = logoWidth(lh);
   if (u > 0.9) drawLogo(ctx, W / 2 - lw / 2, 350, lh, C.brand, seg(u, 0.9, 1.9));
   S.f2.end.forEach((l, i) => riseText(ctx, l, W / 2, 600 + i * 100, seg(u, 1.1 + i * 0.25, 1.8 + i * 0.25),
-    { size: RTL ? 76 : 82, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
+    { size: RTL ? 76 : 82, weight: 700, font: HF, color: i ? C.accentText : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
   const bk = E.hero(seg(u, 1.4, 1.9));
   if (bk > 0) { ctx.save(); ctx.globalAlpha *= bk; ctx.font = `600 30px ${F.ui}`; const w = ctx.measureText(S.url).width + 80;
-    rr(ctx, W / 2 - w / 2, 800, w, 68, 34); ctx.fillStyle = C.brand; ctx.fill();
+    rr(ctx, W / 2 - w / 2, 800, w, 68, 34); ctx.fillStyle = C.btn; ctx.fill();
     text(ctx, S.url, W / 2, 845, { size: 30, weight: 600, font: F.ui, color: "#fff", align: "center" }); ctx.restore(); }
-  const fo = seg(t, DUR - 0.4, DUR); if (fo > 0) { ctx.fillStyle = `rgba(6,14,32,${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
+  const fo = seg(t, DUR - 0.4, DUR); if (fo > 0) { ctx.fillStyle = `rgba(${C.fadeRGB},${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
 }
 
 film({

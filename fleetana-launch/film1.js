@@ -20,7 +20,7 @@ function chaos(ctx, t) {
   const suck = E.inExpo(seg(t, 4.1, 5.05));        // everything collapses into the mark
   ctx.save(); ctx.globalAlpha *= 1 - seg(t, 3.9, 4.3);
   S.f1.hook.forEach((l, i) => riseText(ctx, l, W / 2, 128 + i * 76, seg(t, 0.2 + i * 0.3, 0.9 + i * 0.3),
-    { size: RTL ? 62 : 64, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: RTL ? "rtl" : "ltr", track: RTL ? 0 : -1 }));
+    { size: RTL ? 62 : 64, weight: 700, font: HF, color: i ? C.accentText : C.heading, align: "center", dir: RTL ? "rtl" : "ltr", track: RTL ? 0 : -1 }));
   ctx.restore();
   const push = 1 + t * 0.012;
   ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(push * (1 - suck * 0.98), push * (1 - suck * 0.98)); ctx.rotate(suck * 0.6); ctx.translate(-W / 2, -H / 2 + 110 * (1 - suck));
@@ -84,7 +84,7 @@ function headline(ctx, t) {
   ctx.save(); ctx.globalAlpha = 1 - out;
   const big = lerp(1, 0.6, out);
   S.f1.headline.forEach((l, i) => riseText(ctx, l, W / 2, H / 2 - 10 + i * 128 - out * 200, seg(u, 0.05 + i * 0.25, 0.85 + i * 0.25),
-    { size: 110 * big, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: RTL ? "rtl" : "ltr", track: RTL ? 0 : -2 }));
+    { size: 110 * big, weight: 700, font: HF, color: i ? C.accentText : C.heading, align: "center", dir: RTL ? "rtl" : "ltr", track: RTL ? 0 : -2 }));
   ctx.restore();
 }
 function caption(ctx, t, idx, lt) {
@@ -94,11 +94,11 @@ function caption(ctx, t, idx, lt) {
   const x = X(90), w = 560, mod = MODULES[idx];
   ctx.save(); ctx.globalAlpha = a;
   // step + module eyebrow
-  text(ctx, `0${idx + 1}`, x, 352, { size: 22, weight: 600, font: F.mono, color: C.brand, align: AL("left") });
-  for (let j = 0; j < MODULES.length; j++) { ctx.fillStyle = j <= idx ? C.brand : "rgba(148,163,184,0.25)"; ctx.fillRect(RTL ? x - 50 - (j + 1) * 34 + 6 : x + 50 + j * 34, 344, 28, 4); }
+  text(ctx, `0${idx + 1}`, x, 352, { size: 22, weight: 600, font: F.mono, color: C.accentText, align: AL("left") });
+  for (let j = 0; j < MODULES.length; j++) { ctx.fillStyle = j <= idx ? C.brand : C.inactive; ctx.fillRect(RTL ? x - 50 - (j + 1) * 34 + 6 : x + 50 + j * 34, 344, 28, 4); }
   const ey = E.hero(seg(lt, 0, 0.5));
   icon(ctx, mod.icon, RTL ? x - 30 : x, 400 + (1 - ey) * 20, 30, C.brand, 2.2);
-  text(ctx, idx === 5 ? S.expiringSoon : S.nav[mod.key], RTL ? x - 44 : x + 44, 425 + (1 - ey) * 20, { size: 26, weight: 600, font: RTL ? F.ar : F.ui, color: C.brand, align: AL("left"), alpha: ey, dir: RTL ? "rtl" : "ltr" });
+  text(ctx, idx === 5 ? S.expiringSoon : S.nav[mod.key], RTL ? x - 44 : x + 44, 425 + (1 - ey) * 20, { size: 26, weight: 600, font: RTL ? F.ar : F.ui, color: C.accentText, align: AL("left"), alpha: ey, dir: RTL ? "rtl" : "ltr" });
   const fs = S.f1.caps[idx].reduce((m, l) => { ctx.font = `700 60px ${HF}`; return Math.min(m, 60 * 470 / ctx.measureText(l).width); }, RTL ? 56 : 60);
   S.f1.caps[idx].forEach((l, i) => riseText(ctx, l, x, 520 + i * fs * 1.25, seg(lt, 0.15 + i * 0.12, 0.85 + i * 0.12),
     { size: fs, weight: 700, font: HF, color: C.heading, align: AL("left"), dir: RTL ? "rtl" : "ltr", track: RTL ? 0 : -1 }));
@@ -134,7 +134,7 @@ function tour(ctx, t) {
   ctx.restore();
   // scrim keeps the caption clean while the window is pushed in
   if (zoomAmt > 0) { const g = ctx.createLinearGradient(RTL ? W : 0, 0, RTL ? W - 900 : 900, 0); // 630px solid, then fade
-    g.addColorStop(0, `rgba(9,16,34,${0.98 * zoomAmt})`); g.addColorStop(0.7, `rgba(9,16,34,${0.97 * zoomAmt})`); g.addColorStop(1, "rgba(9,16,34,0)");
+    g.addColorStop(0, `rgba(${C.scrimRGB},${0.98 * zoomAmt})`); g.addColorStop(0.7, `rgba(${C.scrimRGB},${0.97 * zoomAmt})`); g.addColorStop(1, `rgba(${C.scrimRGB},0)`);
     ctx.fillStyle = g; ctx.fillRect(RTL ? W - 900 : 0, 0, 900, H); }
   if (t >= T.tour - 0.1) caption(ctx, t, idx, lt);
 }
@@ -201,14 +201,14 @@ const CONTENT = [
       { key: "d", label: S.colDate, w: 110, num: true }, { key: "p", label: S.colPlate, w: 150, mono: true }, { key: "o", label: S.colOdometer, w: 120, num: true },
       { key: "l", label: S.colVolume, w: 110, num: true }, { key: "c", label: S.colCost, w: 150, num: true }, { key: "e", label: S.colEconomy, w: 220 },
     ], rows.map(r => ({ d: r[0], p: r[1], o: r[2], l: r[3], c: r[4],
-      e: (ctx, x, y) => { const w = text(ctx, r[5], x, y + 7, { size: 18, weight: 600, font: F.ui, color: r[6] && flag > 0 ? "#fbbf24" : C.fg, align: AL("left") });
+      e: (ctx, x, y) => { const w = text(ctx, r[5], x, y + 7, { size: 18, weight: 600, font: F.ui, color: r[6] && flag > 0 ? C.amber : C.fg, align: AL("left") });
         if (r[6] && flag > 0) { ctx.save(); ctx.globalAlpha *= flag; statusPill(ctx, RTL ? x - w - 12 : x + w + 12, y + 8, S.low, "warn", { size: 14, rtl: RTL, dot: false }); ctx.restore(); } } })),
     { reveal: seg(lt, 0.1, 0.8), rowH: 70, highlight: 1, hlColor: C.warn, hlP: flag });
     // the rule, as the app words it
     if (flag > 0) { ctx.save(); ctx.globalAlpha *= flag;
-      card(ctx, b.x + (RTL ? 0 : b.w - 560), b.y + 520, 560, 64, { fill: "#2a2110", stroke: rgba(C.warn, 0.5), r: 10, shadow: true });
-      icon(ctx, "alert", RTL ? b.x + 560 - 46 : b.x + b.w - 560 + 20, b.y + 540, 24, "#fbbf24", 2.2);
-      text(ctx, S.anomalyNote, RTL ? b.x + 560 - 60 : b.x + b.w - 560 + 58, b.y + 559, { size: 17, weight: 500, font: RTL ? F.ar : F.ui, color: "#fde68a", align: AL("left"), dir: RTL ? "rtl" : "ltr" });
+      card(ctx, b.x + (RTL ? 0 : b.w - 560), b.y + 520, 560, 64, { fill: C.warnBg, stroke: rgba(C.warn, 0.5), r: 10, shadow: true });
+      icon(ctx, "alert", RTL ? b.x + 560 - 46 : b.x + b.w - 560 + 20, b.y + 540, 24, C.amber, 2.2);
+      text(ctx, S.anomalyNote, RTL ? b.x + 560 - 60 : b.x + b.w - 560 + 58, b.y + 559, { size: 17, weight: 500, font: RTL ? F.ar : F.ui, color: C.warnText, align: AL("left"), dir: RTL ? "rtl" : "ltr" });
       ctx.restore(); }
   },
   // 04 Inspections — Tyres fails → an issue is raised automatically
@@ -226,13 +226,13 @@ const CONTENT = [
       [[S.pass, "good"], [S.fail, "bad"]].forEach(([l, kind], j) => {
         const on = decided && ((isFail && j === 1) || (!isFail && j === 0));
         const xx = RTL ? sx0 + (1 - j) * segW : sx0 + j * segW;
-        rr(ctx, xx + 3, y + 10, segW - 6, 44, 8); ctx.fillStyle = on ? PILLS[kind].dot : "rgba(51,65,85,0.5)"; ctx.fill();
+        rr(ctx, xx + 3, y + 10, segW - 6, 44, 8); ctx.fillStyle = on ? PILLS[kind].dot : C.track; ctx.fill();
         text(ctx, l, xx + segW / 2, y + 39, { size: 17, weight: 600, font: RTL ? F.ar : F.ui, color: on ? "#fff" : C.muted, align: "center", dir: RTL ? "rtl" : "ltr" });
       });
       if (isFail && lt > failAt) {
         const nk = E.hero(seg(lt, failAt, failAt + 0.4));
         ctx.globalAlpha *= nk;
-        bt(ctx, { ...b, y }, "— " + S.failNote, 230, 40, { size: 17, weight: 500, color: "#fca5a5" });
+        bt(ctx, { ...b, y }, "— " + S.failNote, 230, 40, { size: 17, weight: 500, color: C.redSoft });
         // photo thumbnail
         const px = RTL ? b.x + 20 + segW * 2 + 16 : b.x + b.w - 20 - segW * 2 - 16 - 56;
         rr(ctx, px, y + 6, 56, 52, 6); const g = ctx.createLinearGradient(px, y, px + 56, y + 56); g.addColorStop(0, "#334155"); g.addColorStop(1, "#111827"); ctx.fillStyle = g; ctx.fill();
@@ -277,8 +277,8 @@ const CONTENT = [
     docs.forEach(([d, f, n, date], i) => {
       const k = E.hero(seg(lt, 0.2 + i * 0.15, 0.7 + i * 0.15)); if (k <= 0) return;
       const y = 76 + i * 84; ctx.save(); ctx.globalAlpha *= k; ctx.translate((RTL ? -1 : 1) * (1 - k) * 30, 0);
-      ctx.fillStyle = "rgba(51,65,85,0.35)"; rr(ctx, cb.x + 16, cb.y + y, cb.w - 32, 70, 10); ctx.fill();
-      icon(ctx, "calendar", RTL ? cb.x + cb.w - 64 : cb.x + 36, cb.y + y + 22, 26, n <= 14 ? "#f87171" : "#fbbf24", 2);
+      ctx.fillStyle = C.tint; rr(ctx, cb.x + 16, cb.y + y, cb.w - 32, 70, 10); ctx.fill();
+      icon(ctx, "calendar", RTL ? cb.x + cb.w - 64 : cb.x + 36, cb.y + y + 22, 26, n <= 14 ? C.red : C.amber, 2);
       bt(ctx, cb, d, 80, y + 32, { size: 19, weight: 700, color: C.fg });
       bn(ctx, cb, `${f.model} · ${f.plate}`, 80, y + 58, { size: 15, weight: 500, color: C.muted });
       bn(ctx, cb, date, cb.w - 230, y + 44, { size: 17, weight: 500, color: C.onVariant, align: "right" });
@@ -302,24 +302,24 @@ const CONTENT = [
     });
     ctx.restore();
     // live badge + legend
-    pill(ctx, RTL ? mb.x + mb.w - 20 : mb.x + 20, mb.y + 20, S.mapLive, { bg: "rgba(15,23,42,0.9)", fg: "#4ade80", dot: "#16A34A", size: 17, font: RTL ? F.ar : F.ui, align: RTL ? "right" : "left" });
+    pill(ctx, RTL ? mb.x + mb.w - 20 : mb.x + 20, mb.y + 20, S.mapLive, { bg: C.overlay, fg: C.green, dot: "#16A34A", size: 17, font: RTL ? F.ar : F.ui, align: RTL ? "right" : "left" });
     let lx = RTL ? mb.x + mb.w - 20 : mb.x + 20;
     [[S.moving, "moving", 4], [S.idle, "idling", 1], [S.parked, "parked", 2], [S.noSignal, "stale", 1]].forEach(([l, st, n]) => {
-      const w = pill(ctx, lx, mb.y + mb.h - 60, `${l} ${n}`, { bg: "rgba(15,23,42,0.9)", fg: C.fg, dot: PIN[st][0], size: 16, font: RTL ? F.ar : F.ui, align: RTL ? "right" : "left" });
+      const w = pill(ctx, lx, mb.y + mb.h - 60, `${l} ${n}`, { bg: C.overlay, fg: C.fg, dot: PIN[st][0], size: 16, font: RTL ? F.ar : F.ui, align: RTL ? "right" : "left" });
       lx += (RTL ? -1 : 1) * (w + 10);
     });
     // driver performance card (lib/telematics/driver-score.ts bands)
     const k = E.hero(seg(lt, 1.0, 1.5)); if (k <= 0) return;
     const db = { x: RTL ? mb.x + 24 : mb.x + mb.w - 24 - 400, y: mb.y + 90, w: 400, rtl: RTL };
     ctx.save(); ctx.globalAlpha *= k; ctx.translate((RTL ? -1 : 1) * (1 - k) * 40, 0);
-    card(ctx, db.x, db.y, db.w, 290, { fill: "rgba(30,41,59,0.97)", stroke: C.border, r: 14 });
+    card(ctx, db.x, db.y, db.w, 290, { fill: C.overlayCard, stroke: C.border, r: 14 });
     bt(ctx, db, S.driverPerf, 22, 42, { size: 20, weight: 700, color: C.fg });
     [[S.drivers[0], 94, S.excellent, "good"], [S.drivers[1], 81, S.good, "info"], [S.drivers[2], 63, S.fair, "warn"]].forEach(([n, sc, band, kind], i) => {
       const y = 70 + i * 70, sk = E.outCubic(seg(lt, 1.0 + i * 0.1, 1.6 + i * 0.1));
       bt(ctx, db, n, 22, y + 32, { size: 18, weight: 600, color: C.fg });
       bn(ctx, db, String(Math.round(sc * sk)), 230, y + 33, { size: 26, weight: 700, color: C.fg, align: "right" });
       statusPill(ctx, bx(db, 378), db.y + y + 26, band, kind, { size: 14, rtl: RTL, align: "right", dot: false });
-      ctx.fillStyle = "rgba(51,65,85,0.6)"; ctx.fillRect(db.x + 22, db.y + y + 50, db.w - 44, 5);
+      ctx.fillStyle = C.track; ctx.fillRect(db.x + 22, db.y + y + 50, db.w - 44, 5);
       ctx.fillStyle = PILLS[kind].dot; const bw = (db.w - 44) * sc / 100 * sk; ctx.fillRect(RTL ? db.x + db.w - 22 - bw : db.x + 22, db.y + y + 50, bw, 5);
     });
     ctx.restore();
@@ -351,8 +351,8 @@ function saudi(ctx, t) {
   });
   // road + three fleet vehicles driving through
   const gy = 950;
-  ctx.fillStyle = "rgba(30,41,59,0.9)"; ctx.fillRect(0, gy + 10, W, 120);
-  ctx.fillStyle = "rgba(148,163,184,0.35)"; for (let x = -200 + ((u * 600) % 200); x < W + 200; x += 200) ctx.fillRect(RTL ? W - x - 90 : x, gy + 68, 90, 6);
+  ctx.fillStyle = C.road; ctx.fillRect(0, gy + 10, W, 120);
+  ctx.fillStyle = C.roadDash; for (let x = -200 + ((u * 600) % 200); x < W + 200; x += 200) ctx.fillRect(RTL ? W - x - 90 : x, gy + 68, 90, 6);
   [["truck", -0.2], ["van", 0.65], ["pickup", 1.45]].forEach(([ty, d], i) => {
     const k = seg(u, d, d + 3.6), x = lerp(-560, W + 200, k);
     const sc = ty === "truck" ? 0.82 : 0.78;
@@ -365,7 +365,7 @@ function saudi(ctx, t) {
 function skyline(ctx, u) {
   const a = E.hero(seg(u, 0.2, 1.4)), gy = 900, rise = (1 - a) * 80;
   ctx.save(); ctx.globalAlpha *= 0.9 * a; ctx.translate(0, rise);
-  const g = ctx.createLinearGradient(0, 560, 0, gy); g.addColorStop(0, "rgba(42,137,250,0.10)"); g.addColorStop(1, "rgba(30,41,59,0.85)");
+  const g = ctx.createLinearGradient(0, 560, 0, gy); g.addColorStop(0, C.skyTop); g.addColorStop(1, C.skyBot);
   ctx.fillStyle = g;
   const base = (x, w, h) => ctx.fillRect(x, gy - h, w, h);
   [[60, 90, 120], [170, 60, 180], [240, 120, 90], [380, 70, 210], [470, 110, 140], [1290, 80, 160], [1390, 130, 110], [1540, 70, 230], [1630, 110, 150], [1760, 120, 100]].forEach(([x, w, h]) => base(x, w, h));
@@ -394,11 +394,11 @@ function endCard(ctx, t) {
   const bk = E.hero(seg(u, 1.1, 1.8));
   if (bk > 0) { ctx.save(); ctx.globalAlpha *= bk; ctx.translate(0, (1 - bk) * 20);
     ctx.font = `600 34px ${F.ui}`; const w = ctx.measureText(S.url).width + 90;
-    rr(ctx, W / 2 - w / 2, RTL ? 730 : 700, w, 76, 38); ctx.fillStyle = C.brand; ctx.fill();
+    rr(ctx, W / 2 - w / 2, RTL ? 730 : 700, w, 76, 38); ctx.fillStyle = C.btn; ctx.fill();
     text(ctx, S.url, W / 2, (RTL ? 730 : 700) + 50, { size: 34, weight: 600, font: F.ui, color: "#fff", align: "center" });
     ctx.restore(); }
   const fo = seg(t, DUR - 0.6, DUR);
-  if (fo > 0) { ctx.fillStyle = `rgba(6,14,32,${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
+  if (fo > 0) { ctx.fillStyle = `rgba(${C.fadeRGB},${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
 }
 
 film({

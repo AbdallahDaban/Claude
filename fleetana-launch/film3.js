@@ -13,9 +13,9 @@ function progress(ctx, t) {
   const n = 4, gap = 10, w = (W - 120 - gap * (n - 1)) / n;
   for (let i = 0; i < n; i++) {
     const x = RTL ? W - 60 - (i + 1) * w - i * gap : 60 + i * (w + gap);
-    ctx.fillStyle = "rgba(226,232,240,0.25)"; rr(ctx, x, 290, w, 6, 3); ctx.fill();
+    ctx.fillStyle = C.storyTrack; rr(ctx, x, 290, w, 6, 3); ctx.fill();
     const p = seg(t, CARDS[i], CARDS[i + 1]);
-    ctx.fillStyle = "#ffffff"; rr(ctx, RTL ? x + w * (1 - p) : x, 290, w * p, 6, 3); ctx.fill();
+    ctx.fillStyle = C.storyFill; rr(ctx, RTL ? x + w * (1 - p) : x, 290, w * p, 6, 3); ctx.fill();
   }
   // tiny brand row under the bars, like a story header
   drawMark(ctx, RTL ? W - 88 : 88, 348, 34, C.brand, 1);
@@ -36,7 +36,7 @@ function hook(ctx, t) {
     ctx.save(); ctx.globalAlpha *= clamp(k); ctx.translate(RTL ? 760 - i * 100 : 240 + i * 90, 1420 + i * 130); ctx.scale(1.7 * k, 1.7 * k); chatBubble(ctx, -110, 0, (i - 1) * 0.04, c, { rtl: RTL, time: `22:${String(14 + i * 7)}` }); ctx.restore(); });
   ctx.font = `700 100px ${HF}`; const hs = Math.min(RTL ? 92 : 100, 100 * 960 / Math.max(...S.f3.hook.map(l => ctx.measureText(l).width)));
   S.f3.hook.forEach((l, i) => riseText(ctx, l, W / 2, 620 + i * hs * 1.2, seg(t, 0.2 + i * 0.22, 0.95 + i * 0.22),
-    { size: hs, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
+    { size: hs, weight: 700, font: HF, color: i ? C.accentText : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
   ctx.restore();
 }
 
@@ -49,7 +49,7 @@ function cardScene(ctx, t, i, draw) {
   const lines = S.f3.cards[i];
   ctx.font = `700 92px ${HF}`; const fs = Math.min(92, 92 * 940 / Math.max(...lines.map(l => ctx.measureText(l).width)));
   lines.forEach((l, j) => riseText(ctx, l, W / 2, 540 + j * fs * 1.15, seg(lt, 0.1 + j * 0.12, 0.75 + j * 0.12),
-    { size: fs, weight: 700, font: HF, color: j ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -1.5 }));
+    { size: fs, weight: 700, font: HF, color: j ? C.accentText : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -1.5 }));
   draw(lt, { x: 70, y: 760, w: W - 140, rtl: RTL });
   ctx.restore();
 }
@@ -61,7 +61,7 @@ const DRAW = [
     bt(ctx, b, S.fuelTitle, 48, 80, { size: 38, weight: 700, color: C.fg });
     bn(ctx, b, `${FLEET[1].model} · ${FLEET[1].plate}`, 48, 126, { size: 26, weight: 500, color: C.muted });
     const flag = E.hero(seg(lt, 1.2, 1.6)), v = lerp(9.2, 5.9, E.inOutCubic(seg(lt, 0.5, 1.3)));
-    bn(ctx, b, v.toFixed(1), 48, 300, { size: 150, weight: 700, color: flag > 0.5 ? "#fbbf24" : C.fg });
+    bn(ctx, b, v.toFixed(1), 48, 300, { size: 150, weight: 700, color: flag > 0.5 ? C.amber : C.fg });
     ctx.save(); ctx.font = `700 150px ${F.ui}`; const vw = ctx.measureText(v.toFixed(1)).width; ctx.restore();
     bt(ctx, b, S.u.kmL, 48 + vw + 20, 296, { size: 44, weight: 600, color: C.muted });
     if (flag > 0) { ctx.save(); ctx.globalAlpha *= flag; statusPill(ctx, bx(b, b.w - 48), b.y + 250, S.low, "warn", { size: 34, rtl: RTL, align: "right", dot: false }); ctx.restore(); }
@@ -73,7 +73,7 @@ const DRAW = [
     const nk = E.hero(seg(lt, 1.6, 2.1));
     if (nk > 0) { ctx.save(); ctx.globalAlpha *= nk; const nb = { ...b, y: b.y + 680 };
       const ls = wrapLines(ctx, S.anomalyNote, b.w - 60, `500 34px ${RTL ? F.ar : F.ui}`);
-      ls.forEach((l, j) => bt(ctx, nb, l, 24, 10 + j * 52, { size: 34, weight: 500, color: "#fde68a" })); ctx.restore(); }
+      ls.forEach((l, j) => bt(ctx, nb, l, 24, 10 + j * 52, { size: 34, weight: 500, color: C.warnText })); ctx.restore(); }
   },
   // service overdue: 2 trucks
   (ctx, lt, b) => {
@@ -83,7 +83,7 @@ const DRAW = [
       const y = b.y + i * 330; ctx.save(); ctx.globalAlpha *= k; ctx.translate((RTL ? -1 : 1) * (1 - k) * 80, 0);
       card(ctx, b.x, y, b.w, 300, { fill: C.card, stroke: rgba("#ef4444", 0.45), r: 28 });
       const cb = { ...b, y };
-      icon(ctx, "wrench", RTL ? b.x + b.w - 96 : b.x + 44, y + 44, 52, "#f87171", 2.2);
+      icon(ctx, "wrench", RTL ? b.x + b.w - 96 : b.x + 44, y + 44, 52, C.red, 2.2);
       bt(ctx, cb, r[1], 124, 86, { size: 42, weight: 700, color: C.fg });
       bn(ctx, cb, `${r[0].model} · ${r[0].plate}`, 124, 136, { size: 28, weight: 500, color: C.muted });
       bn(ctx, cb, r[2], 48, 246, { size: 34, weight: 600, color: C.onVariant, font: F.mono });
@@ -93,12 +93,12 @@ const DRAW = [
   },
   // Istimara: 12 days left
   (ctx, lt, b) => {
-    card(ctx, b.x, b.y, b.w, 560, { fill: "#16213a", stroke: C.border, r: 28 });
+    card(ctx, b.x, b.y, b.w, 560, { fill: C.panel, stroke: C.border, r: 28 });
     ctx.fillStyle = C.brand; ctx.fillRect(RTL ? b.x + b.w - 14 : b.x, b.y + 50, 14, 90);
     bt(ctx, b, S.docIstimara, 56, 112, { size: 64, weight: 700, color: C.fg });
     bn(ctx, b, `${FLEET[1].model} · ${FLEET[1].plate}`, 56, 166, { size: 30, weight: 500, color: C.muted });
     const n = Math.round(lerp(30, 12, E.inOutCubic(seg(lt, 0.4, 1.6))));
-    bn(ctx, b, String(n), 56, 410, { size: 220, weight: 700, color: n <= 14 ? "#f87171" : "#fbbf24" });
+    bn(ctx, b, String(n), 56, 410, { size: 220, weight: 700, color: n <= 14 ? C.red : C.amber });
     ctx.save(); ctx.font = `700 220px ${F.ui}`; const nw = ctx.measureText(String(n)).width; ctx.restore();
     bt(ctx, b, RTL ? "يومًا" : "days", 56 + nw + 24, 400, { size: 60, weight: 600, color: C.muted });
     bn(ctx, b, "02/11/2026", 56, 500, { size: 38, weight: 600, color: C.fg, font: F.mono });
@@ -134,12 +134,12 @@ function endCard(ctx, t) {
   drawLogo(ctx, W / 2 - lw / 2, 700, lh, C.brand, seg(u, 0, 1.2));
   if (RTL) text(ctx, "فليتانا", W / 2, 950, { size: 46, weight: 600, font: F.ar, color: C.heading, align: "center", alpha: E.hero(seg(u, 0.9, 1.5)), dir: "rtl" });
   S.f3.cta.forEach((l, i) => riseText(ctx, l, W / 2, (RTL ? 1110 : 1060) + i * 104, seg(u, 0.9 + i * 0.2, 1.6 + i * 0.2),
-    { size: RTL ? 80 : 86, weight: 700, font: HF, color: i ? C.brand : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
+    { size: RTL ? 80 : 86, weight: 700, font: HF, color: i ? C.accentText : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2 }));
   const bk = E.hero(seg(u, 1.2, 1.7));
   if (bk > 0) { ctx.save(); ctx.globalAlpha *= bk; ctx.translate(0, (1 - bk) * 30); ctx.font = `600 44px ${F.ui}`; const w = ctx.measureText(S.url).width + 110;
-    rr(ctx, W / 2 - w / 2, 1330, w, 100, 50); ctx.fillStyle = C.brand; ctx.fill();
+    rr(ctx, W / 2 - w / 2, 1330, w, 100, 50); ctx.fillStyle = C.btn; ctx.fill();
     text(ctx, S.url, W / 2, 1395, { size: 44, weight: 600, font: F.ui, color: "#fff", align: "center" }); ctx.restore(); }
-  const fo = seg(t, DUR - 0.4, DUR); if (fo > 0) { ctx.fillStyle = `rgba(6,14,32,${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
+  const fo = seg(t, DUR - 0.4, DUR); if (fo > 0) { ctx.fillStyle = `rgba(${C.fadeRGB},${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
 }
 
 film({

@@ -20,6 +20,30 @@ const C = {
   // semantic (used sparingly, for vehicle state / costs)
   good: "#10b981", warn: "#f59e0b", bad: "#ef4444", chart2: "#60a5fa", chart3: "#93c5fd",
 };
+// Semantic tokens for things the films draw (dark values; light values below)
+Object.assign(C, {
+  accentText: C.brand, btn: C.brand, panel: "#16213a", well: "#0b1326", wellHi: "#16213a", wellLo: "#111a2e", wellRGB: "11,19,38",
+  overlay: "rgba(15,23,42,0.92)", overlayCard: "rgba(30,41,59,0.97)", track: "rgba(51,65,85,0.6)", rowLine: "rgba(51,65,85,0.6)",
+  tint: "rgba(51,65,85,0.35)", inactive: "rgba(148,163,184,0.25)", shadow: "rgba(0,0,0,0.35)",
+  amber: "#fbbf24", red: "#f87171", redSoft: "#fca5a5", green: "#4ade80", greenLine: "rgba(74,222,128,0.6)",
+  warnBg: "#2a2110", warnText: "#fde68a", scrimRGB: "9,16,34", fadeRGB: "6,14,32", puffRGB: "203,213,225",
+  road: "rgba(30,41,59,0.9)", roadDash: "rgba(148,163,184,0.35)", skyTop: "rgba(42,137,250,0.10)", skyBot: "rgba(30,41,59,0.85)",
+  storyTrack: "rgba(226,232,240,0.25)", storyFill: "#ffffff",
+});
+// ?theme=light → the app's light tokens (:root for app UI, .marketing for the marketing surface)
+const THEME = new URLSearchParams(location.search).get("theme") === "light" ? "light" : "dark";
+if (THEME === "light") Object.assign(C, {
+  bg: "#ffffff", surface: "#f7f9fb", card: "#ffffff", card2: "#f8fafc", container: "#eceef0",
+  border: "#d9d9d9", mkBorder: "#e3e4e8", on: "#191c1e", onVariant: "#45464d", heading: "#000000",
+  muted: "#64748b", fg: "#0f172a", accentDeep: "#e8f2ff", accentFg: "#1e3a8a", gradFrom: "#f7f9fb", gradTo: "#e6e8ea",
+  accentText: "#0051d5", btn: "#000000", panel: "#ffffff", well: "#f1f5f9", wellHi: "#ffffff", wellLo: "#f8fafc", wellRGB: "241,245,249",
+  overlay: "rgba(255,255,255,0.96)", overlayCard: "rgba(255,255,255,0.98)", track: "rgba(203,213,225,0.8)", rowLine: "rgba(217,217,217,0.9)",
+  tint: "rgba(241,245,249,1)", inactive: "rgba(100,116,139,0.22)", shadow: "rgba(15,23,42,0.12)",
+  amber: "#b45309", red: "#b91c1c", redSoft: "#dc2626", green: "#15803d", greenLine: "rgba(21,128,61,0.45)",
+  warnBg: "#fffbeb", warnText: "#92400e", scrimRGB: "247,249,251", fadeRGB: "247,249,251", puffRGB: "100,116,139",
+  road: "rgba(203,213,225,0.9)", roadDash: "rgba(255,255,255,0.95)", skyTop: "rgba(0,81,213,0.06)", skyBot: "rgba(148,163,184,0.45)",
+  storyTrack: "rgba(15,23,42,0.15)", storyFill: "#0f172a",
+});
 const F = {
   head: '"Hanken Grotesk", sans-serif',  // marketing surface
   ui: '"Inter", sans-serif',             // app
@@ -120,7 +144,7 @@ const STREAMS = [[26.157, 48.46, 13.76, -9.23], [1.796, 30.79, 14.2, -2.65], [51
   [9.489, 37.65, 5.53, -8.76], [83.836, 57.3, 6.19, -4.11], [45.004, 33.07, 11.09, -0.79], [85.984, 36.23, 7.61, -4.72], [4.721, 23.47, 6.47, -9.97],
   [64.784, 32.44, 5.34, -9.65], [85.878, 52.41, 10.47, -9.52], [27.069, 54.97, 10.81, -3.96], [68.336, 47.71, 5.4, -0.81], [47.635, 62.35, 13.37, -4.75], [21.494, 57.73, 10.72, -8.47]];
 const tri = x => { const f = fract(x / 2) * 2; return f < 1 ? f : 2 - f; }; // bounce, as the original reverses at the walls
-function kineticBg(ctx, W, H, t, { light = false, density = 1, alpha = 1, speed = 1 } = {}) {
+function kineticBg(ctx, W, H, t, { light = THEME === "light", density = 1, alpha = 1, speed = 1 } = {}) {
   const g = ctx.createLinearGradient(0, 0, W, H);
   g.addColorStop(0, light ? C.lBg : C.gradFrom); g.addColorStop(1, light ? "#e6e8ea" : C.gradTo);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
@@ -155,7 +179,7 @@ function kineticBg(ctx, W, H, t, { light = false, density = 1, alpha = 1, speed 
 function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
 function card(ctx, x, y, w, h, { fill = C.card, stroke = C.border, r = 14, shadow = true } = {}) {
   ctx.save();
-  if (shadow) { ctx.shadowColor = "rgba(0,0,0,0.35)"; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18; }
+  if (shadow) { ctx.shadowColor = C.shadow; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18; }
   rr(ctx, x, y, w, h, r); ctx.fillStyle = fill; ctx.fill(); ctx.restore();
   if (stroke) { rr(ctx, x + 0.5, y + 0.5, w - 1, h - 1, r); ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; ctx.stroke(); }
 }

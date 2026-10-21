@@ -53,7 +53,7 @@ function vehicle(ctx, type, x, y, scale = 1, { t = 0, moving = false, body = "#e
 
 // ── Fleet map (stylized Riyadh-like road net; pins exactly like fleet-map.tsx) ─
 const PIN = { moving: ["#16A34A", "#15803D"], idling: ["#D97706", "#92400E"], parked: ["#475569", "#334155"], stale: ["#94A3B8", "#64748B"] };
-function mapBase(ctx, b, t, { zoom = 1, light = false } = {}) {
+function mapBase(ctx, b, t, { zoom = 1, light = THEME === "light" } = {}) {
   ctx.save(); rr(ctx, b.x, b.y, b.w, b.h, b.r ?? 14); ctx.clip();
   ctx.fillStyle = light ? "#eef1f5" : "#0b1326"; ctx.fillRect(b.x, b.y, b.w, b.h);
   const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
@@ -105,7 +105,7 @@ function mapPin(ctx, x, y, state, s = 1, { pulse = 0, label = null, rtl = false 
   if (label) {
     ctx.save(); ctx.font = `600 ${15 * s}px ${F.mono}`; const w = ctx.measureText(label).width + 18 * s;
     const lx = rtl ? x - 26 * s - w : x + 26 * s;
-    rr(ctx, lx, y - 14 * s, w, 28 * s, 6 * s); ctx.fillStyle = "rgba(15,23,42,0.92)"; ctx.fill(); ctx.strokeStyle = C.border; ctx.lineWidth = 1; ctx.stroke();
+    rr(ctx, lx, y - 14 * s, w, 28 * s, 6 * s); ctx.fillStyle = C.overlay; ctx.fill(); ctx.strokeStyle = C.border; ctx.lineWidth = 1; ctx.stroke();
     ctx.fillStyle = C.fg; ctx.textBaseline = "middle"; ctx.textAlign = "left"; ctx.fillText(label, lx + 9 * s, y + 1); ctx.restore();
   }
 }
@@ -153,13 +153,19 @@ function table(ctx, b, cols, rows, { rowH = 58, headH = 46, reveal = 1, highligh
       const o = { size: 18, weight: c.bold ? 600 : 500, color: c.color || C.fg, align: c.align || "left" };
       (c.mono || c.num ? bn : bt)(ctx, { ...b, y }, String(v), pos[i] + (c.align === "right" ? c.w - 20 : 0), rowH / 2 + 7, { ...o, font: c.mono ? F.mono : (b.rtl && !c.num ? F.ar : F.ui) });
     });
-    if (k < rows.length - 1) { ctx.fillStyle = "rgba(51,65,85,0.6)"; ctx.fillRect(b.x + 16, y + rowH, b.w - 32, 1); }
+    if (k < rows.length - 1) { ctx.fillStyle = C.rowLine; ctx.fillRect(b.x + 16, y + rowH, b.w - 32, 1); }
     ctx.restore();
     r._y = y;
   });
 }
 // Status pill colours used in the app UI (badges)
-const PILLS = {
+const PILLS = THEME === "light" ? {
+  good: { bg: "rgba(22,163,74,0.12)", fg: "#15803d", dot: "#16A34A" },
+  warn: { bg: "rgba(217,119,6,0.14)", fg: "#b45309", dot: "#D97706" },
+  bad: { bg: "rgba(239,68,68,0.12)", fg: "#b91c1c", dot: "#ef4444" },
+  info: { bg: "rgba(42,137,250,0.12)", fg: "#1e3a8a", dot: "#2a89fa" },
+  muted: { bg: "rgba(100,116,139,0.12)", fg: "#475569", dot: "#94A3B8" },
+} : {
   good: { bg: "rgba(22,163,74,0.16)", fg: "#4ade80", dot: "#16A34A" },
   warn: { bg: "rgba(217,119,6,0.18)", fg: "#fbbf24", dot: "#D97706" },
   bad: { bg: "rgba(239,68,68,0.16)", fg: "#f87171", dot: "#ef4444" },
@@ -184,7 +190,7 @@ function statTile(ctx, b, label, value, { sub = null, valueColor = C.fg, p = 1 }
 function toast(ctx, b, title, body, kind = "bad", p = 1) {
   const k = E.hero(clamp(p)); if (k <= 0) return;
   ctx.save(); ctx.globalAlpha *= clamp(k * 1.5); ctx.translate((b.rtl ? -1 : 1) * (1 - k) * 60, 0);
-  card(ctx, b.x, b.y, b.w, b.h, { fill: "#16213a", stroke: rgba(PILLS[kind].dot, 0.6), r: 14 });
+  card(ctx, b.x, b.y, b.w, b.h, { fill: C.panel, stroke: rgba(PILLS[kind].dot, 0.6), r: 14 });
   ctx.fillStyle = PILLS[kind].dot; ctx.fillRect(b.rtl ? b.x + b.w - 5 : b.x, b.y + 14, 5, b.h - 28);
   icon(ctx, kind === "bad" ? "alert" : "bell", bx(b, 24) - (b.rtl ? 28 : 0), b.y + 22, 28, PILLS[kind].fg, 2.2);
   bt(ctx, b, title, 70, 44, { size: 21, weight: 700, color: C.fg });
@@ -227,10 +233,11 @@ function chatBubble(ctx, x, y, rot, s, { rtl = false, time = "21:47" } = {}) {
   ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
   ctx.font = `500 22px ${rtl ? F.ar : F.ui}`; const w = Math.max(160, ctx.measureText(s).width + 110);
   ctx.shadowColor = "rgba(0,0,0,0.4)"; ctx.shadowBlur = 20; ctx.shadowOffsetY = 8;
-  ctx.fillStyle = "#1f2c34"; rr(ctx, 0, 0, w, 64, 14); ctx.fill(); ctx.shadowColor = "transparent";
-  ctx.fillStyle = "#e9edef"; ctx.textBaseline = "middle"; ctx.direction = rtl ? "rtl" : "ltr"; ctx.textAlign = rtl ? "right" : "left";
+  const lt = THEME === "light";   // chat app's own light / dark bubble colours
+  ctx.fillStyle = lt ? "#ffffff" : "#1f2c34"; rr(ctx, 0, 0, w, 64, 14); ctx.fill(); ctx.shadowColor = "transparent";
+  ctx.fillStyle = lt ? "#111b21" : "#e9edef"; ctx.textBaseline = "middle"; ctx.direction = rtl ? "rtl" : "ltr"; ctx.textAlign = rtl ? "right" : "left";
   ctx.fillText(s, rtl ? w - 18 : 18, 33);
-  ctx.direction = "ltr"; ctx.textAlign = rtl ? "left" : "right"; ctx.fillStyle = "#8696a0"; ctx.font = `400 14px ${F.ui}`; ctx.fillText(time, rtl ? 16 : w - 16, 46);
+  ctx.direction = "ltr"; ctx.textAlign = rtl ? "left" : "right"; ctx.fillStyle = lt ? "#667781" : "#8696a0"; ctx.font = `400 14px ${F.ui}`; ctx.fillText(time, rtl ? 16 : w - 16, 46);
   ctx.restore();
 }
 function paperChecklist(ctx, x, y, rot, rtl, items) {
