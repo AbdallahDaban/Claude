@@ -10,7 +10,8 @@ import path from "node:path";
 const WORKERS = 4;
 const stills = process.argv[2] === "--stills";
 const [film, target, ...rest] = process.argv.slice(stills ? 3 : 2);
-const url = "file://" + path.resolve(film) + "?render";
+const [filmFile, query] = film.split("?");
+const url = "file://" + path.resolve(filmFile) + "?render" + (query ? "&" + query : "");
 
 const browser = await chromium.launch({ args: ["--force-color-profile=srgb"] });
 async function page() {
@@ -44,7 +45,7 @@ const flush = async () => {
   while (done.has(next)) {
     const buf = done.get(next); done.delete(next);
     if (!ff.stdin.write(buf)) await new Promise(r => ff.stdin.once("drain", r));
-    if (++next % (fps * 5) === 0) console.error(`${path.basename(film)}: ${next}/${frames}`);
+    if (++next % (fps * 5) === 0) console.error(`${film}: ${next}/${frames}`);
   }
 };
 await Promise.all(pages.map(async (p, w) => {
