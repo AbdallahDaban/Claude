@@ -1,0 +1,12 @@
+@font-face{font-family:'IBM Plex Sans';font-style:italic;font-weight:400;src:url(fonts/IBMPlexSans-400i.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:400;src:url(fonts/IBMPlexSans-400.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:500;src:url(fonts/IBMPlexSans-500.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:600;src:url(fonts/IBMPlexSans-600.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Sans';font-style:normal;font-weight:700;src:url(fonts/IBMPlexSans-700.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:400;src:url(fonts/IBMPlexSansArabic-400.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:500;src:url(fonts/IBMPlexSansArabic-500.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:600;src:url(fonts/IBMPlexSansArabic-600.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Sans Arabic';font-style:normal;font-weight:700;src:url(fonts/IBMPlexSansArabic-700.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;src:url(fonts/IBMPlexMono-400.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;src:url(fonts/IBMPlexMono-500.ttf) format('truetype');}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:600;src:url(fonts/IBMPlexMono-600.ttf) format('truetype');}
