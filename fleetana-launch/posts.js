@@ -52,14 +52,14 @@ function eyebrow(ctx, label, iconName, y) {
   text(ctx, label, RTL ? x - 52 : x + 52, y, { size: 30, weight: 600, font: RTL ? F.ar : F.ui, color: C.accentText, align: AL("left"), dir: DIR });
 }
 function body(ctx, s, y, { size = 34, color = C.onVariant, maxW = 900, x = null, align = "left" } = {}) {
-  const fnt = `500 ${size}px ${RTL ? F.ar : F.ui}`, lines = wrapLines(ctx, s, maxW, fnt);
+  const fnt = `500 ${size}px ${RTL ? F.ar : F.ui}`, lines = s.split("\n").flatMap(p => wrapLines(ctx, p, maxW, fnt));
   lines.forEach((l, i) => text(ctx, l, x ?? (align === "center" ? W / 2 : X(80)), y + i * size * (RTL ? 1.6 : 1.4), { size, weight: 500, font: RTL ? F.ar : F.ui, color, align: align === "center" ? "center" : AL("left"), dir: DIR }));
   return y + lines.length * size * (RTL ? 1.6 : 1.4);
 }
 // draw a UI block at scale s with its top-left at (x, y) in a w-wide design box
 function scaled(ctx, x, y, s, fn) { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); fn(); ctx.restore(); }
 const box = (w, extra = {}) => ({ x: 0, y: 0, w, rtl: RTL, ...extra });
-function trackerTag(ctx, y) { statusPill(ctx, X(80), y, S.f1.tracker, "info", { size: 24, rtl: RTL }); }
+function trackerTag(ctx, y) { statusPill(ctx, X(80), y, S.f1.tracker, "info", { size: 28, rtl: RTL }); }
 
 // ── UI blocks (same data as the films) ─────────────────────────────────────
 function vehiclesCard(ctx, w, rows = 5, drivers = false) {
@@ -108,6 +108,7 @@ function inspectionCard(ctx, w) {
   toast(ctx, box(w, { y: 270, h: 104 }), S.issuesRaised, `${S.failNote} · ${S.issueOpen}`, "bad", 1);
 }
 function docCardS(ctx, x, y, w, h, title, sub, date, n, back) {
+  h = back ? h : Math.min(h, 270);
   card(ctx, x, y, w, h, { fill: "#fff", r: 20 });
   const b = { x, y, w, rtl: RTL };
   ctx.fillStyle = C.brand; ctx.fillRect(RTL ? x + w - 10 : x, y + 24, 10, 60);
@@ -122,7 +123,7 @@ function fuelChart(ctx, w, h, { threshold = true, values = [9.4, 9.0, 9.3, 9.1, 
   card(ctx, 0, 0, w, h, { fill: "#fff", r: 20 });
   const b = box(w);
   bn(ctx, b, `${FLEET[1].model} · ${FLEET[1].plate}`, 36, 58, { size: 26, weight: 700, color: C.fg });
-  bt(ctx, b, `${S.colEconomy} · km/L`, 36, 94, { size: 20, weight: 500, color: C.muted });
+  bt(ctx, b, `${S.colEconomy} · ${S.u.kmL}`, 36, 94, { size: 20, weight: 500, color: C.muted });
   const avg = 9.2, thr = avg * 0.7, top = 150, bot = h - 60, sc = (bot - top) / 11, gutter = 150, cw = (w - 100 - gutter - 4 * 22) / 5;
   const ly = v => bot - v * sc;
   ctx.strokeStyle = "rgba(100,116,139,0.6)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(RTL ? gutter + 30 : 30, ly(avg)); ctx.lineTo(RTL ? w - 30 : w - 30 - gutter, ly(avg)); ctx.stroke();
@@ -160,7 +161,7 @@ function driverCard(ctx, w) {
     const y = 96 + i * 76;
     bt(ctx, b, n, 32, y + 30, { size: 24, weight: 600, color: C.fg });
     bn(ctx, b, String(sc), w * 0.62, y + 32, { size: 34, weight: 700, color: C.fg, align: "right" });
-    statusPill(ctx, bx(b, w - 32), y + 22, band, kind, { size: 18, rtl: RTL, align: "right", dot: false });
+    statusPill(ctx, bx(b, w - 32), y + 22, band, kind, { size: 22, rtl: RTL, align: "right", dot: false });
     ctx.fillStyle = C.track; ctx.fillRect(32, y + 50, w - 64, 6);
     ctx.fillStyle = PILLS[kind].dot; const bw = (w - 64) * sc / 100; ctx.fillRect(RTL ? w - 32 - bw : 32, y + 50, bw, 6);
   });
@@ -183,7 +184,7 @@ const POSTS = {
     base(ctx, BG_TINT); brandBar(ctx, { slide: s, total: 6 });
     if (s === 1) {
       headline(ctx, S.f1.headline, 330, { size: 112 });
-      body(ctx, P.ig2.sub, RTL ? 548 : 520);
+      body(ctx, P.ig2.sub, RTL ? 560 : 545);
       scaled(ctx, 80, 660, 1.3, () => vehiclesCard(ctx, 708, 4));
       footer(ctx, { swipe: true }); return;
     }
@@ -194,7 +195,7 @@ const POSTS = {
       ctx.font = `600 36px ${F.ui}`; const w = ctx.measureText(S.url).width + 100;
       rr(ctx, W / 2 - w / 2, 900, w, 88, 44); ctx.fillStyle = C.btn; ctx.fill();
       text(ctx, S.url, W / 2, 957, { size: 36, weight: 600, font: F.ui, color: "#fff", align: "center" });
-      body(ctx, P.ig2.langs, 1090, { align: "center", size: 28, color: C.muted }); return;
+      body(ctx, P.ig2.langs, 1090, { align: "center", size: 30, color: C.muted, maxW: 940 }); return;
     }
     const m = [null, null, ["vehicles", "truck", 0], ["service", "wrench", 1], ["fuel", "fuel", 2], ["inspections", "clipboard", 3]][s];
     eyebrow(ctx, s === 5 ? P.ig2.inspWo : S.nav[m[0]], m[1], 250);
@@ -212,7 +213,7 @@ const POSTS = {
     headline(ctx, P.ig3.title, 300, { size: 86, accent: [2] });
     const docs = [[S.docFahes, FLEET[2], "16/11/2026", 26], [S.docInsurance, FLEET[4], "09/11/2026", 19], [S.docIstimara, FLEET[1], "02/11/2026", 12]];
     docs.forEach((d, i) => docCardS(ctx, 80, 590 + i * 96, 920, 340, d[0], `${d[1].model} · ${d[1].plate}`, d[2], d[3], i < 2));
-    body(ctx, P.ig3.note, 1160, { size: 28, color: C.muted });
+    body(ctx, P.ig3.note, 1110, { size: 30, color: C.muted });
     footer(ctx);
   } },
 
@@ -243,18 +244,18 @@ const POSTS = {
     headline(ctx, q.titles[s - 2], 360, { size: 72, accent: [] });
     if (s === 2) {
       // economy = distance since last full fill ÷ fuel added since then
-      const y0 = 640;
-      [["88,912 km", q.lastFull], ["89,278 km", q.thisFull]].forEach(([km, lbl], i) => {
+      const y0 = 680;
+      [[`88,912 ${S.u.km}`, q.lastFull], [`89,278 ${S.u.km}`, q.thisFull]].forEach(([km, lbl], i) => {
         const x = RTL ? W - 80 - 420 - i * 500 : 80 + i * 500;
         card(ctx, x, y0, 420, 170, { fill: "#fff", r: 20 });
         bt(ctx, box(420, { x, y: y0 }), lbl, 32, 56, { size: 24, weight: 600, color: C.muted });
-        bn(ctx, box(420, { x, y: y0 }), km, 32, 126, { size: 48, weight: 700, color: C.fg, font: F.mono });
+        bt(ctx, box(420, { x, y: y0 }), km, 32, 126, { size: 48, weight: 700, color: C.fg, font: RTL ? F.ar : F.mono });
       });
-      card(ctx, 80, 860, 920, 220, { fill: "#fff", r: 20 });
-      const b = box(920, { x: 80, y: 860 });
-      bn(ctx, b, "366 km ÷ 62.0 L", 40, 92, { size: 52, weight: 700, color: C.fg });
-      bn(ctx, b, "= 5.9 km/L", 40, 172, { size: 52, weight: 700, color: C.amber });
-      body(ctx, q.partial, 1170, { size: 26, color: C.muted });
+      card(ctx, 80, 890, 920, 220, { fill: "#fff", r: 20 });
+      const b = box(920, { x: 80, y: 890 });
+      bt(ctx, b, RTL ? "366 كم ÷ 62.0 لتر" : "366 km ÷ 62.0 L", 40, 92, { size: 52, weight: 700, color: C.fg });
+      bt(ctx, b, RTL ? "= 5.9 كم/لتر" : "= 5.9 km/L", 40, 172, { size: 52, weight: 700, color: C.amber });
+      body(ctx, q.partial, 1170, { size: 28, color: C.muted });
     }
     if (s === 3) scaled(ctx, 80, 580, 1, () => fuelChart(ctx, 920, 600, { threshold: false, values: [9.4, 9.0, 9.3, 9.1, 9.2] }));
     if (s === 4) { scaled(ctx, 80, 560, 1, () => fuelChart(ctx, 920, 560)); body(ctx, S.anomalyNote + (RTL ? " — " : " — ") + q.check, 1160, { size: 28, color: C.warnText }); }
@@ -292,7 +293,7 @@ const POSTS = {
     const mb = { x: 80, y: 760, w: 920, h: 800, r: 24 };
     mapBase(ctx, mb, 0, { zoom: 1.2 }); ctx.strokeStyle = C.border; ctx.lineWidth = 2; rr(ctx, mb.x, mb.y, mb.w, mb.h, 24); ctx.stroke();
     const roads = ROADS(mb); [[0, 0.3, "moving"], [1, 0.55, "idling"], [3, 0.35, "moving"], [5, 0.6, "parked"], [2, 0.4, "stale"]].forEach(([r, u, st]) => { const p = along(roads[r], u); mapPin(ctx, p[0], p[1], st, 1.5); });
-    statusPill(ctx, W / 2, 1640, S.f1.tracker, "info", { size: 26, rtl: RTL, align: "center" });
+    statusPill(ctx, W / 2, 1640, S.f1.tracker, "info", { size: 30, rtl: RTL, align: "center" });
   } },
 
   // IG 8 — carousel: spreadsheet vs Fleetana
@@ -345,7 +346,7 @@ const POSTS = {
       text(ctx, String(i + 1), X(104), y, { size: 24, weight: 700, font: F.ui, color: C.accentText, align: "center" });
       y = body(ctx, p, y, { x: X(150), maxW: 840, size: 28, color: C.onVariant }) + 18;
     });
-    statusPill(ctx, RTL ? 80 : W - 80, H - 98, S.f1.tracker, "info", { size: 24, rtl: RTL, align: "right" });   // far side from the url
+    statusPill(ctx, RTL ? 80 : W - 80, H - 98, S.f1.tracker, "info", { size: 28, rtl: RTL, align: "right" });   // far side from the url
     footer(ctx);
   } },
 };
@@ -392,7 +393,7 @@ POSTS.li2 = { slides: 7, draw(ctx, s) {
     trackerTag(ctx, 1090); }
   if (i === 4) { card(ctx, 80, 600, 920, 300, { fill: "#fff", r: 20 }); const b = box(920, { x: 80, y: 600 });
     bn(ctx, b, S.woTitle, 40, 64, { size: 28, weight: 700, color: C.fg, font: F.mono });
-    bt(ctx, b, S.woLines[0][1], 40, 150, { size: 34, weight: 700, color: C.fg }); bn(ctx, b, "SAR 420.00", 880, 150, { size: 34, weight: 700, color: C.fg, align: "right" });
+    bt(ctx, b, S.woLines[0][1], 40, 150, { size: 34, weight: 700, color: C.fg });
     statusPill(ctx, bx(b, 40), 600 + 230, `${S.warranty} · ${S.activeUntil("14/03/2027")}`, "good", { size: 26, rtl: RTL }); }
   body(ctx, rule, i === 4 ? 980 : 1150, { size: 30, color: C.onVariant });
   footer(ctx);

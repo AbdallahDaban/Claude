@@ -202,7 +202,6 @@ function leakWarranty(ctx, lt) {
   ctx.fillStyle = C.border; ctx.fillRect(b.x + 30, b.y + 116, b.w - 60, 1);
   bt(ctx, b, S.woLines[0][0], 36, 166, { size: 20, weight: 500, color: C.muted });
   bt(ctx, b, S.woLines[0][1], 150, 170, { size: 32, weight: 700, color: C.fg });
-  bn(ctx, b, "SAR 420.00", b.w - 36, 170, { size: 32, weight: 700, color: C.fg, align: "right" });
   // stamp
   const sk = E.outBack(seg(lt, 0.9, 1.25));
   if (sk > 0) {
