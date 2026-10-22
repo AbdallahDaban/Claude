@@ -2,26 +2,30 @@
 // Each leak is one rule from the code: fuel economy < 70% of the 30-day average (lib/fuel-economy.ts),
 // service due by km/hours/date (lib/service-reminders.ts), documents expiring (dashboard, 30 days),
 // idle time from the tracker (lib/telematics/trips.ts), warranty "active until" (lib/warranty.ts).
-const W = 1920, H = 1080, DUR = 30;
+// ?format=vertical → 1080×1920 reel: statement on top, the same hero visuals below, inside the Reels safe zone
+const VERT = new URLSearchParams(location.search).get("format") === "vertical";
+const W = VERT ? 1080 : 1920, H = VERT ? 1920 : 1080, DUR = 30;
+const VY = VERT ? 680 : 0;                        // hero visuals drop below the statement in vertical
+const SW = VERT ? 920 : 800;                       // statement column width
 const LEAKS = [3.0, 7.8, 12.6, 17.4, 21.6, 26.4];   // on the 100 BPM grid (0.6 s beats)    // start of each leak, then end card
 const ICONS = ["fuel", "wrench", "calendar", "pin", "shield"];
 const HF = RTL ? F.ar : F.head;
 const DIR = RTL ? "rtl" : "ltr";
 const X = x => (RTL ? W - x : x);
-const ZX = RTL ? 100 : 980, ZW = 840;            // hero zone (right half; left half in Arabic)
+const ZX = VERT ? 120 : RTL ? 100 : 980, ZW = 840;   // hero zone (right half; left half in Arabic; centred when vertical)
 const AL = a => (RTL ? (a === "left" ? "right" : a === "right" ? "left" : a) : a);
 
 // big statement lines: line 1 lands, line 2 (resolution) lands in brand blue
-function statement(ctx, l1, l2, lt, t2, { y = 500, size = RTL ? 72 : 76 } = {}) {
-  const x = X(110);
-  ctx.save(); ctx.font = `700 ${size}px ${HF}`; const fs = Math.min(size, size * 800 / Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width)); ctx.restore();
+function statement(ctx, l1, l2, lt, t2, { y = VERT ? 560 - VY : 500, size = RTL ? 72 : 76 } = {}) {
+  const x = X(VERT ? 80 : 110);
+  ctx.save(); ctx.font = `700 ${size}px ${HF}`; const fs = Math.min(size, size * SW / Math.max(ctx.measureText(l1).width, ctx.measureText(l2).width)); ctx.restore();
   riseText(ctx, l1, x, y, seg(lt, 0.15, 0.85), { size: fs, weight: 700, font: HF, color: C.heading, align: AL("left"), dir: DIR, track: RTL ? 0 : -1.5 });
   riseText(ctx, l2, x, y + fs * 1.22, seg(lt, t2, t2 + 0.6), { size: fs, weight: 700, font: HF, color: C.accentText, align: AL("left"), dir: DIR, track: RTL ? 0 : -1.5 });
 }
 // leak counter: 01 / 05 + label, plus five progress ticks
 function counter(ctx, i, lt) {
-  const k = E.hero(seg(lt, 0, 0.5)), x = X(110);
-  ctx.save(); ctx.globalAlpha *= k;
+  const k = E.hero(seg(lt, 0, 0.5)), x = X(VERT ? 80 : 110);
+  ctx.save(); ctx.globalAlpha *= k; ctx.translate(0, VERT ? 400 - 330 - VY : 0);
   text(ctx, `0${i + 1}`, x, 330, { size: 22, weight: 600, font: F.mono, color: C.accentText, align: AL("left") });
   text(ctx, S.f2.leak[i], RTL ? x - 54 : x + 54, 330, { size: 22, weight: 600, font: RTL ? F.ar : F.ui, color: C.onVariant, align: AL("left"), dir: DIR });
   for (let j = 0; j < 5; j++) { ctx.fillStyle = j <= i ? C.brand : C.inactive; ctx.fillRect(RTL ? x - 40 - j * 52 : x + j * 52, 352, 40, 4); }
@@ -30,27 +34,27 @@ function counter(ctx, i, lt) {
 function enterExit(ctx, t, a, b, fn) { // shared in/out for a leak block
   if (t < a - 0.05 || t > b + 0.05) return;
   const out = E.inOutExpo(seg(t, b - 0.35, b + 0.05));
-  ctx.save(); ctx.globalAlpha *= 1 - out; ctx.translate(0, -out * 60); fn(t - a); ctx.restore();
+  ctx.save(); ctx.globalAlpha *= 1 - out; ctx.translate(0, -out * 60 + VY); fn(t - a); ctx.restore();
 }
 
 // ── 0: hook — receipts rain, the question lands ────────────────────────────
 const RECEIPTS = Array.from({ length: 16 }, (_, i) => ({
-  x: 120 + hash(i, 1) * 1680, d: hash(i, 2) * 1.1, rot: (hash(i, 3) - 0.5) * 0.7, s: 0.7 + hash(i, 4) * 0.5,
+  x: (120 + hash(i, 1) * 1680) * (VERT ? 1080 / 1920 : 1), d: hash(i, 2) * 1.1, rot: (hash(i, 3) - 0.5) * 0.7, s: 0.7 + hash(i, 4) * 0.5,
   lines: [["SASCO", "ALDREES", "PETROMIN", "NAFT"][i % 4], `${String(10 + (i % 18)).padStart(2, "0")}/10/2026`, ["DIESEL", "PETROL 91", "SERVICE", "TYRES"][i % 4],
     `SAR ${fmt([232.4, 135.16, 1150, 1840, 96.75, 420][i % 6], 2)}`, "", "———"],
 }));
 function hook(ctx, t) {
   RECEIPTS.forEach(r => {
     const k = seg(t, r.d, r.d + 1.6); if (k <= 0) return;
-    const y = lerp(-420, 1300, E.inCubic(k) * 0.55 + k * 0.45);
+    const y = lerp(-420, H + 220, E.inCubic(k) * 0.55 + k * 0.45);
     ctx.save(); ctx.globalAlpha *= THEME === "light" ? 0.95 : 0.55; ctx.translate(r.x, y); ctx.scale(r.s, r.s); receipt(ctx, -110, 0, r.rot + k * 0.4 * Math.sign(r.rot), r.lines); ctx.restore();
   });
   const dim = ctx.createRadialGradient(W / 2, H / 2, 100, W / 2, H / 2, 900);
   dim.addColorStop(0, `rgba(${C.fadeRGB},${THEME === "light" ? 0.8 : 0.85})`); dim.addColorStop(1, `rgba(${C.fadeRGB},${THEME === "light" ? 0 : 0.2})`); ctx.fillStyle = dim; ctx.fillRect(0, 0, W, H);
   const out = E.inOutExpo(seg(t, 2.65, 3.0));
-  ctx.save(); ctx.globalAlpha *= 1 - out; ctx.translate(0, -out * 80);
+  ctx.save(); ctx.globalAlpha *= 1 - out; ctx.translate(0, -out * 80 + (VERT ? 320 : 0));
   S.f2.hook.forEach((l, i) => riseText(ctx, l, W / 2, 500 + i * 128, seg(t, 0.35 + i * 0.25, 1.15 + i * 0.25),
-    { size: RTL ? 112 : 118, weight: 700, font: HF, color: i ? C.accentText : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2.5 }));
+    { size: VERT ? (RTL ? 92 : 96) : RTL ? 112 : 118, weight: 700, font: HF, color: i ? C.accentText : C.heading, align: "center", dir: DIR, track: RTL ? 0 : -2.5 }));
   ctx.restore();
 }
 
@@ -86,7 +90,7 @@ function leakFuel(ctx, lt, t) {
   ctx.fillStyle = C.border; ctx.fillRect(b.x + 30, base, b.w - 60, 2);
   ctx.restore();
   const fk = E.hero(seg(lt, 2.7, 3.2));
-  text(ctx, S.f2.fuelFoot, X(110), 760, { size: RTL ? 36 : 38, weight: 500, font: RTL ? F.ar : F.ui, color: C.onVariant, align: AL("left"), alpha: fk, dir: DIR });
+  text(ctx, S.f2.fuelFoot, X(VERT ? 80 : 110), VERT ? 790 - VY : 760, { size: RTL ? 36 : 38, weight: 500, font: RTL ? F.ar : F.ui, color: C.onVariant, align: AL("left"), alpha: fk, dir: DIR });
 }
 
 // ── 2: service — rolling odometer, reminder flips to Overdue ───────────────
@@ -221,6 +225,7 @@ function endCard(ctx, t) {
   const glow = ctx.createRadialGradient(W / 2, 470, 0, W / 2, 470, 800);
   glow.addColorStop(0, rgba(C.brand, 0.16 * seg(u, 0.4, 1.2))); glow.addColorStop(1, rgba(C.brand, 0)); ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
   const conv = E.inOutExpo(seg(u, 0.55, 1.05));
+  ctx.save(); if (VERT) ctx.translate(0, 420);
   ICONS.forEach((ic, i) => {
     const k = E.outBack(seg(u, i * 0.06, 0.4 + i * 0.06)); if (k <= 0 || conv >= 1) return;
     const x0 = W / 2 + (i - 2) * 150 * (RTL ? -1 : 1), x = lerp(x0, W / 2, conv), y = lerp(380, 400, conv), s = lerp(1, 0.2, conv);
@@ -236,6 +241,7 @@ function endCard(ctx, t) {
   if (bk > 0) { ctx.save(); ctx.globalAlpha *= bk; ctx.font = `600 30px ${F.ui}`; const w = ctx.measureText(S.url).width + 80;
     rr(ctx, W / 2 - w / 2, 800, w, 68, 34); ctx.fillStyle = C.btn; ctx.fill();
     text(ctx, S.url, W / 2, 845, { size: 30, weight: 600, font: F.ui, color: "#fff", align: "center" }); ctx.restore(); }
+  ctx.restore();
   const fo = seg(t, DUR - 0.4, DUR); if (fo > 0) { ctx.fillStyle = `rgba(${C.fadeRGB},${E.inCubic(fo)})`; ctx.fillRect(0, 0, W, H); }
 }
 

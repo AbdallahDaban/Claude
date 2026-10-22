@@ -206,5 +206,20 @@ def film3():
     m.write("audio/film3.wav", fade_out=1.0)
 
 
+def film4():
+    m = Mix(15.0, 44); rs = m.rs; beat = 0.5
+    m.put(whoosh(rs, 0.3), 0.0, 0.35)
+    for k in range(4): m.put(kick(rs, punch=0.7), 0.2 + k * beat, 0.4)
+    m.put(riser(rs, 0.8), 1.4, 0.4)
+    groove(m, 2.2, 11.8, beat, PROG, energy=0.9)
+    for i in range(8): m.put(blip(1046 + 120 * i, 0.06), 2.4 + i * 0.08, 0.08, (i % 2) * 0.6 - 0.3, 0.3)   # pins landing
+    m.put(blip(660, 0.12, 1.3), 3.8, 0.18)                                                                     # idle label
+    m.put(whoosh(rs, 0.4), 6.6, 0.4)
+    for k in range(8): m.put(click(rs), 7.1 + k * 0.1, 0.12)                                                   # scores counting
+    m.put(impact(rs, 2.4), 11.8, 0.6); m.put(pad([50, 57, 62, 66, 69, 74], 3.2, bright=2400, attack=0.08), 11.8, 0.3, 0, 0.7)
+    for f, p in ((midi(74), -0.3), (midi(78), 0.3), (midi(81), 0)): m.put(chime(f, 2.4), 11.9, 0.12, p, 0.7)
+    m.write("audio/film4.wav", fade_out=0.9)
+
+
 if __name__ == "__main__":
-    film1(); film2(); film3()
+    film1(); film2(); film3(); film4()
