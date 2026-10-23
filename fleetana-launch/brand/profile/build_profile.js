@@ -40,15 +40,24 @@ async function build(lang) {
   });
   const arrow = (s, x, y, n) => s.addImage({ path: A("icons/icon-arrowRight.png"), x: X(x, 0.24), y, w: 0.24, h: 0.24, rotate: ar ? 180 : 0, objectName: `arrow-${n}` });
   const divider = (n, [t, b], sec) => {
-    const s = pres.addSlide({ masterName: "Section divider", sectionTitle: sec });
+    const s = add({ masterName: "Section divider", sectionTitle: sec });
     s.addText(n, { placeholder: "number", rtlMode: ar }); s.addText(t, { placeholder: "title", rtlMode: ar }); s.addText(b, { placeholder: "body", rtlMode: ar });
   };
-  const titled = (t, sec) => { const s = pres.addSlide({ masterName: "Title only", sectionTitle: sec }); s.addText(title2(...t), { placeholder: "title", rtlMode: ar }); return s; };
+  const titled = (t, sec) => { const s = add({ masterName: "Title only", sectionTitle: sec }); s.addText(title2(...t), { placeholder: "title", rtlMode: ar }); return s; };
   const SEC = T.sections;
+  // alternate backgrounds so slides stay distinct when the PDF is scrolled on a phone
+  let n = 0;
+  const add = (o) => {
+    const s = pres.addSlide(o), even = ++n % 2 === 0;
+    if (o.masterName === "Title only" && even) s.background = { color: SKY };
+    if (o.masterName === "Section divider" && !even) s.background = { path: A("cover-16x9.jpg") };
+    if (o.masterName === "Closing" && even) s.background = { path: A("divider-16x9.jpg") };
+    return s;
+  };
 
   // ── about ─────────────────────────────────────────────────────────────────
   pres.addSection({ title: SEC[0] });
-  let s = pres.addSlide({ masterName: "Cover", sectionTitle: SEC[0] });
+  let s = add({ masterName: "Cover", sectionTitle: SEC[0] });
   s.addText(T.cover.eyebrow, { placeholder: "eyebrow", rtlMode: ar });
   s.addText(title2(...T.cover.title), { placeholder: "title", rtlMode: ar });
   s.addText(T.cover.sub, { placeholder: "body", rtlMode: ar });
@@ -228,7 +237,7 @@ async function build(lang) {
   });
   notes(s, T.team.notes);
 
-  s = pres.addSlide({ masterName: "Closing", sectionTitle: SEC[5] });
+  s = add({ masterName: "Closing", sectionTitle: SEC[5] });
   s.addText(T.closing[0], { placeholder: "title", rtlMode: ar });
   s.addText(T.closing[1], { placeholder: "body", rtlMode: ar });
 
@@ -238,6 +247,7 @@ async function build(lang) {
 }
 
 // ── copy ────────────────────────────────────────────────────────────────────
+const SKY = "DCEAFB";   // even-numbered content slides: a deeper tint of sky blue
 const COPY = {
   en: {
     meta: { title: "Fleetana — company profile" },
@@ -273,7 +283,7 @@ const COPY = {
       ["IN YOUR DECISIONS", "See, decide, save", "Spot the waste, act on it, and watch the cost per vehicle come down."]],
       notes: "The whole offer on one slide: hardware, software, outcome." },
     overview: { title: ["Everything that", "touches your fleet"], items: [
-      ["truck", "Vehicles & documents", "Plates, drivers, Istimara, insurance and Fahes for every vehicle."],
+      ["truck", "Vehicles & documents", "Istimara, insurance and Fahes, with automatic reminders before every expiry."],
       ["wrench", "Service & maintenance", "Programs by km, engine hours or date. Due soon and overdue at a glance."],
       ["fuel", "Fuel", "km/L on every full fill. Low fills flagged."],
       ["clipboard", "Inspections & issues", "Custom checklists with photos. A failed item opens an issue."],
@@ -302,7 +312,8 @@ const COPY = {
       "36 standard service tasks ready on day one",
       "Inspections on the mobile app, with photos; a failed item opens an issue automatically",
       "Work orders with parts, labour, fees, 15% VAT and approval",
-      "Parts stock per location, and warranty periods on parts and repairs"],
+      "Parts stock per location, and warranty periods on parts and repairs",
+      "Automatic notifications before every service, inspection and document renewal"],
       notes: "Demo data on screen." },
     devices: { title: ["Two trackers,", "every vehicle covered"], bestFor: "Best for  ", notes: "We supply, install and support both trackers.", items: [
       { id: "fmc003", brand: "TELTONIKA", name: "FMC003", tagline: "Plug-and-play OBD tracker",
@@ -322,12 +333,12 @@ const COPY = {
     savings: { title: ["Find the leaks.", "Fix them."], groups: [
       ["fuel", "Fuel", ["Fuel anomalies flagged", "Idle time cut", "Shorter, optimised routes"]],
       ["wrench", "Maintenance", ["Service before breakdowns", "No paying twice under warranty", "Every work order itemised"]],
-      ["truck", "Fleet", ["Cost per vehicle and per km", "Retire the costliest vehicles", "Keep documents valid"]],
+      ["truck", "Fleet", ["Cost per vehicle and per km", "Retire the costliest vehicles", "Automatic expiry reminders"]],
       ["shield", "Safety", ["Driver scores and coaching", "Crash and over-speed alerts", "Remote engine cut-off"]]],
       notes: "Where the savings come from. Each one is an action the client takes with what Fleetana shows them." },
     saudi: { title: ["Built for", "Saudi fleets"], chips: ["Istimara", "Fahes", "Insurance", "SAR + 15% VAT", "CST-certified trackers", "العربية · English"],
       whoTitle: "Made for fleets like yours", who: [["truck", "Delivery & courier"], ["wrench", "Construction & heavy equipment"], ["box", "Distribution & retail"], ["users", "Passenger & school transport"]],
-      papers: "Expiry dates live on each vehicle, and Home lists everything expiring in the next 30 days.", notes: "Adjust the industries to the client." },
+      papers: "Fleetana follows up every document and notifies you before each Istimara, insurance and Fahes expiry.", notes: "Adjust the industries to the client." },
     onboard: { title: ["How we get", "you running"], steps: [
       ["users", "Sign up", "Create your workspace at fleetana.sa and invite your team."],
       ["truck", "Add vehicles", "Vehicles, drivers and document dates, imported or added by hand."],
@@ -336,7 +347,7 @@ const COPY = {
       notes: "Most of setup happens in the first week." },
     team: { title: ["The founders", "behind Fleetana"], people: [
       ["abdallah", "Abdallah Daban", "Operations & Strategy"], ["abdulrahman", "Abdulrahman Alaskar", "Product Manager"],
-      ["faisal", "Faisal Sharif", "Business Development"], ["ali", "Ali Choudhary", "Business & Customer Manager"]],
+      ["faisal", "Faisal Alsharif", "Business Development"], ["ali", "Ali Chaudhry", "Business & Customer Manager"]],
       notes: "Four founders, one team: operations, product, business development and customers." },
     closing: ["Get your fleet off spreadsheets.", "fleetana.sa  ·  admin@fleetana.sa"],
   },
@@ -374,7 +385,7 @@ const COPY = {
       ["في قراراتك", "ارَ، قرّر، وفّر", "اكشف الهدر، وتصرّف، وشاهد تكلفة كل مركبة تنخفض."]],
       notes: "العرض كله في شريحة واحدة: الجهاز، والنظام، والنتيجة." },
     overview: { title: ["كل ما يتعلق", "بأسطولك"], items: [
-      ["truck", "المركبات والوثائق", "اللوحات والسائقون والاستمارة والتأمين والفحص الدوري لكل مركبة."],
+      ["truck", "المركبات والوثائق", "الاستمارة والتأمين والفحص الدوري، مع تذكيرات تلقائية قبل كل انتهاء."],
       ["wrench", "الصيانة والوقاية", "برامج بالكيلومترات أو ساعات التشغيل أو التاريخ، مع القادم والمتأخر بنظرة."],
       ["fuel", "الوقود", "كم/لتر لكل تعبئة كاملة، والتعبئة غير المعتادة تظهر بعلامة «منخفض»."],
       ["clipboard", "الفحوصات والبلاغات", "قوائم فحص مخصصة مع الصور، والبند الفاشل يفتح بلاغًا."],
@@ -403,7 +414,8 @@ const COPY = {
       "36 مهمة صيانة قياسية جاهزة من اليوم الأول",
       "فحوصات على تطبيق الجوال مع الصور، والبند الفاشل يفتح بلاغًا تلقائيًا",
       "أوامر عمل بالقطع والعمالة والرسوم وضريبة 15٪ وخطوات الاعتماد",
-      "مخزون القطع لكل موقع، وفترات الضمان على القطع والإصلاحات"],
+      "مخزون القطع لكل موقع، وفترات الضمان على القطع والإصلاحات",
+      "إشعارات تلقائية قبل كل صيانة وفحص وتجديد وثيقة"],
       notes: "بيانات توضيحية على الشاشة." },
     devices: { title: ["جهازان،", "لكل مركبة في أسطولك"], bestFor: "الأنسب لـ: ", notes: "نوفّر الجهازين ونركّبهما وندعمهما.", items: [
       { id: "fmc003", brand: "TELTONIKA", name: "FMC003", tagline: "جهاز تتبع يُركَّب في منفذ OBD",
@@ -423,12 +435,12 @@ const COPY = {
     savings: { title: ["اكشف الهدر،", "وأوقفه."], groups: [
       ["fuel", "الوقود", ["تعبئة غير معتادة تظهر فورًا", "وقت خمول أقل", "مسارات أقصر ومُحسَّنة"]],
       ["wrench", "الصيانة", ["صيانة قبل الأعطال", "لا دفع مرتين لإصلاح تحت الضمان", "كل أمر عمل مفصّل"]],
-      ["truck", "الأسطول", ["تكلفة كل مركبة ولكل كيلومتر", "استبعاد المركبات الأعلى تكلفة", "وثائق سارية دائمًا"]],
+      ["truck", "الأسطول", ["تكلفة كل مركبة ولكل كيلومتر", "استبعاد المركبات الأعلى تكلفة", "تذكير تلقائي قبل انتهاء الوثائق"]],
       ["shield", "السلامة", ["تقييم السائقين وتوجيههم", "تنبيهات الحوادث والسرعة الزائدة", "إيقاف المحرك عن بُعد"]]],
       notes: "من أين يأتي التوفير. كل بند إجراء يتخذه العميل بناءً على ما يُظهره فليتانا." },
     saudi: { title: ["صُمّم", "للأساطيل السعودية"], chips: ["الاستمارة", "الفحص الدوري", "التأمين", "الريال وضريبة 15٪", "أجهزة معتمدة من الهيئة", "العربية · English"],
       whoTitle: "لأساطيل مثل أسطولك", who: [["truck", "التوصيل والشحن"], ["wrench", "البناء والمعدات الثقيلة"], ["box", "التوزيع والتجزئة"], ["users", "نقل الركاب والنقل المدرسي"]],
-      papers: "تواريخ الانتهاء محفوظة في سجل كل مركبة، والرئيسية تعرض ما ينتهي خلال 30 يومًا.", notes: "عدّل القطاعات حسب العميل." },
+      papers: "يتابع فليتانا كل وثيقة ويُشعرك قبل انتهاء الاستمارة والتأمين والفحص الدوري.", notes: "عدّل القطاعات حسب العميل." },
     onboard: { title: ["كيف نبدأ", "معك"], steps: [
       ["users", "سجّل", "أنشئ مساحة عملك على fleetana.sa وادعُ فريقك."],
       ["truck", "أضف مركباتك", "المركبات والسائقون وتواريخ الوثائق، استيرادًا أو يدويًا."],
@@ -437,7 +449,7 @@ const COPY = {
       notes: "معظم الإعداد يتم في الأسبوع الأول." },
     team: { title: ["المؤسسون", "خلف فليتانا"], people: [
       ["abdallah", "عبدالله ضبان", "العمليات والاستراتيجية"], ["abdulrahman", "عبدالرحمن العسكر", "مدير المنتج"],
-      ["faisal", "فيصل شريف", "تطوير الأعمال"], ["ali", "علي شودري", "مدير الأعمال والعملاء"]],
+      ["faisal", "فيصل الشريف", "تطوير الأعمال"], ["ali", "علي شودري", "مدير الأعمال والعملاء"]],
       notes: "أربعة مؤسسين، فريق واحد: العمليات، والمنتج، وتطوير الأعمال، والعملاء." },
     closing: ["أخرج أسطولك من جداول البيانات.", "fleetana.sa  ·  admin@fleetana.sa"],
   },

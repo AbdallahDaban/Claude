@@ -32,7 +32,8 @@ function createDeck(lang, title) {
   const txt = (o) => ({ isTextBox: true, margin: 0, rtlMode: ar, align: AL, ...o });
 
   // ── layouts ────────────────────────────────────────────────────────────────
-  const logo = (h = 0.26, y = 0.42) => ({ image: { path: A("logo-blue.png"), x: X(M, h * 7.27), y, w: h * 7.27, h } });
+  // logo sits on the side opposite the title, so it never reads as a second heading
+  const logo = (h = 0.26, y = 0.42) => ({ image: { path: A("logo-blue.png"), x: X(W - M - h * 7.27, h * 7.27), y, w: h * 7.27, h } });
   const footer = [
     { text: { text: "fleetana.sa", options: { x: X(M, 3), y: H - 0.5, w: 3, h: 0.25, fontSize: 10, color: HEX.muted, align: AL, margin: 0 } } },
   ];
