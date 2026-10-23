@@ -219,6 +219,7 @@ async function build(lang) {
     const x = M + i * 3.07, w = 2.85, y = 2.3, d = 1.9, px = x + (w - d) / 2;
     card(s, x, y, w, 4.1, `team-${id}`);
     const photo = path.join(__dirname, "team", `${id}.jpg`);
+    s.addShape(pres.shapes.OVAL, { x: X(px - 0.07, d + 0.14), y: y + 0.25, w: d + 0.14, h: d + 0.14, fill: { color: HEX.tint }, line: { color: HEX.blue, width: 1.5 }, objectName: `ring-${id}` });
     if (fs.existsSync(photo)) s.addImage({ path: photo, x: X(px, d), y: y + 0.32, w: d, h: d, rounding: true, objectName: `photo-${id}`, altText: n });
     else s.addText(n.split(" ").map(p => p[0]).join(""), txt({ x: X(px, d), y: y + 0.32, w: d, h: d, fontSize: 44, bold: true, color: HEX.accent, fontFace: HF,
       align: "center", valign: "middle", fill: { color: HEX.tint }, shape: pres.shapes.OVAL, objectName: `photo-${id}` }));
