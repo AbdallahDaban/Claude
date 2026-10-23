@@ -1,0 +1,59 @@
+/* Fleetana design tokens — v2 (Oct 2026). Values come from the shipped app (app/globals.css).
+   Fonts (OFL, Google Fonts): Hanken Grotesk 400–800, Inter 400–700, IBM Plex Sans Arabic 400–700, IBM Plex Mono 400–600
+   https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap
+*/
+:root {
+  /* Brand */
+  --fl-blue:        #2A89FA;  /* logo, fills, icons, charts, large text only on white (3.47:1) */
+  --fl-accent:      #0051D5;  /* blue TEXT on light: headline payoff, links, eyebrows (6.7:1) */
+  --fl-navy:        #1E3A8A;  /* text on tint, active nav */
+  --fl-black:       #000000;  /* headlines; CTA buttons on marketing surfaces */
+  --fl-ink:         #0F172A;  /* body + UI text */
+  --fl-on-variant:  #45464D;  /* secondary text */
+  --fl-muted:       #64748B;  /* labels, metadata, footers */
+  /* Surfaces */
+  --fl-paper:       #F7F9FB;  /* default background */
+  --fl-tint:        #E8F2FF;  /* alternate background, active states */
+  --fl-container:   #ECEEF0;
+  --fl-white:       #FFFFFF;  /* cards, pages */
+  --fl-border:      #D9D9D9;
+  --fl-hairline:    #E3E4E8;
+  /* Vehicle / status (app map pins + badges) — never brand blue */
+  --fl-moving: #16A34A;  --fl-moving-bg: #E3F4E9;  --fl-moving-fg: #15803D;
+  --fl-idle:   #D97706;  --fl-idle-bg:   #FAECDC;  --fl-idle-fg:   #B45309;
+  --fl-parked: #475569;  --fl-parked-bg: #ECEEF1;  --fl-parked-fg: #475569;
+  --fl-nosignal: #94A3B8;
+  --fl-fault:  #EF4444;  --fl-fault-bg:  #FDE9E9;  --fl-fault-fg:  #B91C1C;
+  --fl-info-bg: #E5F1FE; --fl-info-fg: #1E3A8A;
+  /* Charts */
+  --fl-chart-1: #2A89FA; --fl-chart-2: #60A5FA; --fl-chart-3: #1E3A8A; --fl-chart-4: #93C5FD; --fl-chart-5: #475569;
+  /* Dark "Deep Space" — product dark mode only */
+  --fl-dark-bg: #0F172A; --fl-dark-card: #1E293B; --fl-dark-border: #334155; --fl-dark-text: #F8FAFC; --fl-dark-muted: #94A3B8;
+  /* Type */
+  --fl-head: 'Hanken Grotesk', 'IBM Plex Sans Arabic', Arial, sans-serif;
+  --fl-sans: 'Inter', 'IBM Plex Sans Arabic', Arial, sans-serif;
+  --fl-ar:   'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  --fl-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --fl-lh-latin: 1.4;  --fl-lh-arabic: 1.6;
+  /* Shape + motion */
+  --fl-radius-card: 18px; --fl-radius-sm: 10px; --fl-pill: 999px;
+  --fl-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  --fl-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+body { font-family: var(--fl-sans); color: var(--fl-ink); background: var(--fl-paper); line-height: var(--fl-lh-latin); }
+[dir="rtl"], .fl-ar { font-family: var(--fl-ar); line-height: var(--fl-lh-arabic); }
+h1, h2, .fl-head { font-family: var(--fl-head); font-weight: 700; color: var(--fl-black); letter-spacing: -0.02em; line-height: 1.12; }
+[dir="rtl"] h1, [dir="rtl"] h2 { font-family: var(--fl-ar); letter-spacing: 0; }
+.fl-payoff { color: var(--fl-accent); }
+a { color: var(--fl-accent); }
+.fl-card { background: var(--fl-white); border: 1.5px solid var(--fl-border); border-radius: var(--fl-radius-card); box-shadow: var(--fl-shadow); }
+.fl-btn { background: var(--fl-black); color: #fff; font-weight: 600; border: 0; border-radius: var(--fl-pill); padding: 14px 32px; }
+.fl-btn--app { background: var(--fl-blue); border-radius: var(--fl-radius-sm); }
+.fl-data { font-family: var(--fl-mono); font-weight: 500; }
+.fl-pill { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; padding: 4px 11px; border-radius: var(--fl-pill); }
+.fl-pill .fl-dot { width: 8px; height: 8px; border-radius: 50%; }
+.fl-moving { background: var(--fl-moving-bg); color: var(--fl-moving-fg); } .fl-moving .fl-dot { background: var(--fl-moving); }
+.fl-idle   { background: var(--fl-idle-bg);   color: var(--fl-idle-fg); }   .fl-idle .fl-dot   { background: var(--fl-idle); }
+.fl-parked { background: var(--fl-parked-bg); color: var(--fl-parked-fg); } .fl-parked .fl-dot { background: var(--fl-parked); }
+.fl-fault  { background: var(--fl-fault-bg);  color: var(--fl-fault-fg); }  .fl-fault .fl-dot  { background: var(--fl-fault); }
+.fl-info   { background: var(--fl-info-bg);   color: var(--fl-info-fg); }

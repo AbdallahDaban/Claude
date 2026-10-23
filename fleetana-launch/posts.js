@@ -399,6 +399,9 @@ POSTS.li2 = { slides: 7, draw(ctx, s) {
   footer(ctx);
 } };
 
-const def = POSTS[POST]; if (def.w) { W = def.w; H = def.h; }
-film({ w: W, h: H, fps: 60, dur: 1 / 60, render(ctx) { def.draw(ctx, SLIDE); } });
-window.POSTDEF = { slides: def.slides || 1, w: W, h: H };
+// assets.html loads this file for its drawing helpers only (window.NO_POST)
+if (!window.NO_POST) {
+  const def = POSTS[POST]; if (def.w) { W = def.w; H = def.h; }
+  film({ w: W, h: H, fps: 60, dur: 1 / 60, render(ctx) { def.draw(ctx, SLIDE); } });
+  window.POSTDEF = { slides: def.slides || 1, w: W, h: H };
+}
