@@ -9,7 +9,7 @@ const {
   Document, Packer, Paragraph, TextRun, ImageRun, Header, Footer, AlignmentType, HeadingLevel, PageNumber,
   Table, TableRow, TableCell, WidthType, BorderStyle, ShadingType, LevelFormat, PageBreak,
   HorizontalPositionRelativeFrom, VerticalPositionRelativeFrom, TextWrappingType,
-  PositionalTab, PositionalTabAlignment, PositionalTabRelativeTo, PositionalTabLeader, VerticalAlign, TableLayoutType,
+  PositionalTab, PositionalTabAlignment, PositionalTabRelativeTo, PositionalTabLeader, VerticalAlign, TableLayoutType, LineRuleType,
 } = require("docx");
 
 const ASSETS = path.join(__dirname, "../../assets");
@@ -24,7 +24,7 @@ function build(lang, kind) {
   const F = (latin) => ({ ascii: latin, hAnsi: latin, cs: "IBM Plex Sans Arabic", eastAsia: latin });
   const HEAD = F("Hanken Grotesk"), BODY = F("Inter"), MONO = F("IBM Plex Mono");
   const T = TEXT[lang];
-  const align = ar ? AlignmentType.RIGHT : AlignmentType.LEFT;
+  const align = AlignmentType.START;   // logical: right in RTL, left in LTR
   const p = (text, o = {}) => new Paragraph({ bidirectional: ar, alignment: o.alignment ?? align, style: o.style, heading: o.heading,
     numbering: o.numbering, spacing: o.spacing, keepNext: o.keepNext, border: o.border, shading: o.shading, indent: o.indent,
     children: Array.isArray(text) ? text : [new TextRun({ text, rightToLeft: ar, ...o.run })] });
@@ -35,30 +35,31 @@ function build(lang, kind) {
   const logoRun = (h) => new ImageRun({ type: "png", data: img("logo-blue.png"), transformation: { width: Math.round(h * 7.27), height: h },
     altText: { title: "Fleetana", description: "Fleetana logo", name: "Fleetana logo" } });
   const header = new Header({ children: [new Paragraph({ alignment: ar ? AlignmentType.RIGHT : AlignmentType.LEFT, spacing: { after: 0 }, children: [logoRun(30)] })] });
-  const footer = new Footer({ children: [new Paragraph({
-    bidirectional: ar, alignment: ar ? AlignmentType.RIGHT : AlignmentType.LEFT,
-    border: { top: { style: BorderStyle.SINGLE, size: 4, color: COL.border, space: 6 } },
-    children: [
-      new TextRun({ text: "fleetana.sa", size: 16, color: COL.muted, font: BODY }),
-      new TextRun({ children: [new PositionalTab({ alignment: ar ? PositionalTabAlignment.LEFT : PositionalTabAlignment.RIGHT, relativeTo: PositionalTabRelativeTo.MARGIN, leader: PositionalTabLeader.NONE })] }),
-      new TextRun({ children: [T.page + " ", PageNumber.CURRENT, " " + T.of + " ", PageNumber.TOTAL_PAGES], size: 16, color: COL.muted, rightToLeft: ar, font: BODY }),
-    ] })] });
+  const NOB = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
+  const footCell = (runs, alignment) => new TableCell({ width: { size: CONTENT / 2, type: WidthType.DXA }, margins: { top: 100, bottom: 0, left: 0, right: 0 },
+    borders: { top: { style: BorderStyle.SINGLE, size: 4, color: COL.border }, left: NOB, bottom: NOB, right: NOB },
+    children: [new Paragraph({ bidirectional: ar, alignment, spacing: { after: 0 }, children: runs })] });
+  const footer = new Footer({ children: [new Table({ width: { size: CONTENT, type: WidthType.DXA }, columnWidths: [CONTENT / 2, CONTENT / 2], layout: TableLayoutType.FIXED, visuallyRightToLeft: ar,
+    rows: [new TableRow({ children: [
+      footCell([new TextRun({ text: "fleetana.sa", size: 16, color: COL.muted, font: BODY })], AlignmentType.START),
+      footCell([new TextRun({ children: [T.page + " ", PageNumber.CURRENT, " " + T.of + " ", PageNumber.TOTAL_PAGES], size: 16, color: COL.muted, rightToLeft: ar, font: BODY })], AlignmentType.END),
+    ] })] })] });
 
   // ── shared content blocks ─────────────────────────────────────────────────
   const tableCell = (children, { fill = null, w, bold = false, header = false } = {}) => new TableCell({
     width: { size: w, type: WidthType.DXA }, verticalAlign: VerticalAlign.CENTER,
     margins: { top: 90, bottom: 90, left: 140, right: 140 },
     shading: fill ? { type: ShadingType.CLEAR, fill, color: "auto" } : undefined,
-    borders: { top: { style: BorderStyle.SINGLE, size: 4, color: COL.border }, bottom: { style: BorderStyle.SINGLE, size: 4, color: COL.border },
-      left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" } },
-    children: [new Paragraph({ bidirectional: ar, alignment: align, spacing: { after: 0, line: 264 },
+    borders: { top: { style: BorderStyle.SINGLE, size: 4, color: COL.border }, left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+      bottom: { style: BorderStyle.SINGLE, size: 4, color: COL.border }, right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" } },
+    children: [new Paragraph({ bidirectional: ar, alignment: align, spacing: { after: 0, line: 264 , lineRule: LineRuleType.AUTO},
       children: Array.isArray(children) ? children : [run(children, { bold: bold || header, size: header ? 17 : 19, color: header ? COL.navy : COL.ink })] })],
   });
   const fleetTable = () => {
     const w = [Math.round(CONTENT * 0.3), Math.round(CONTENT * 0.22), Math.round(CONTENT * 0.2)]; w.push(CONTENT - w[0] - w[1] - w[2]);
     const rows = T.table.rows.map((r, i) => new TableRow({ children: [
       tableCell(r[0], { w: w[0], fill: i % 2 ? COL.paper : null, bold: true }),
-      tableCell([new TextRun({ text: r[1], font: MONO, size: 18, color: COL.ink })], { w: w[1], fill: i % 2 ? COL.paper : null }),
+      tableCell([new TextRun({ text: "\u2066" + r[1] + "\u2069", font: MONO, size: 18, color: COL.ink })], { w: w[1], fill: i % 2 ? COL.paper : null }),
       tableCell([pill(r[2][0], r[2][1])], { w: w[2], fill: i % 2 ? COL.paper : null }),
       tableCell([new TextRun({ text: r[3], font: MONO, size: 18, color: COL.onv })], { w: w[3], fill: i % 2 ? COL.paper : null }),
     ] }));
@@ -72,7 +73,7 @@ function build(lang, kind) {
   ];
   const callout = (text) => p(text, { style: "Callout" });
   const kv = (rows) => new Table({ width: { size: CONTENT, type: WidthType.DXA }, columnWidths: [2600, CONTENT - 2600], layout: TableLayoutType.FIXED, visuallyRightToLeft: ar,
-    borders: { top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: COL.border }, insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" } },
+    borders: { top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" }, insideHorizontal: { style: BorderStyle.SINGLE, size: 4, color: COL.border }, insideVertical: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" } },
     rows: rows.map(([k, v]) => new TableRow({ children: [
       new TableCell({ width: { size: 2600, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 0, right: 120 }, children: [p(k, { run: { size: 17, color: COL.muted, bold: true }, spacing: { after: 0 } })] }),
       new TableCell({ width: { size: CONTENT - 2600, type: WidthType.DXA }, margins: { top: 80, bottom: 80, left: 0, right: 0 }, children: [p(v, { run: { size: 20, color: COL.ink }, spacing: { after: 0 } })] }),
@@ -113,7 +114,7 @@ function build(lang, kind) {
       p(T.body.p5),
       kv(T.styles),
       p(T.body.dataLabel, { spacing: { before: 240, after: 60 }, run: { size: 17, color: COL.muted, bold: true } }),
-      p(T.body.data, { style: "Data" }),
+      new Paragraph({ style: "Data", bidirectional: false, alignment: ar ? AlignmentType.RIGHT : AlignmentType.LEFT, children: [new TextRun({ text: T.body.data, font: MONO })] }),
       p("", {}),
       p(T.body.closing, { spacing: { before: 240, after: 0 } }),
       p(T.body.sigName, { run: { bold: true, size: 22 }, spacing: { after: 0 } }),
@@ -145,30 +146,30 @@ function build(lang, kind) {
     creator: "Fleetana", title: kind === "document" ? T.cover.title : T.letter.subject, description: "Fleetana brand template",
     styles: {
       default: {
-        document: { run: { font: BODY, size: 21, color: COL.ink, rightToLeft: ar }, paragraph: { spacing: { line: lineBody, after: 140 } } },
-        title: { run: { font: HEAD, size: 60, bold: true, color: COL.black, rightToLeft: ar }, paragraph: { spacing: { after: 120, line: 276 } } },
-        heading1: { run: { font: HEAD, size: 40, bold: true, color: COL.black, rightToLeft: ar }, paragraph: { spacing: { before: 420, after: 160, line: 276 }, keepNext: true } },
-        heading2: { run: { font: HEAD, size: 30, bold: true, color: COL.black, rightToLeft: ar }, paragraph: { spacing: { before: 300, after: 100, line: 276 }, keepNext: true } },
+        document: { run: { font: BODY, size: 21, color: COL.ink, rightToLeft: ar }, paragraph: { spacing: { line: lineBody, lineRule: LineRuleType.AUTO, after: 140 } } },
+        title: { run: { font: HEAD, size: 60, bold: true, color: COL.black, rightToLeft: ar }, paragraph: { spacing: { after: 120, line: 276 , lineRule: LineRuleType.AUTO} } },
+        heading1: { run: { font: HEAD, size: 40, bold: true, color: COL.black, rightToLeft: ar }, paragraph: { spacing: { before: 420, after: 160, line: 276 , lineRule: LineRuleType.AUTO}, keepNext: true } },
+        heading2: { run: { font: HEAD, size: 30, bold: true, color: COL.black, rightToLeft: ar }, paragraph: { spacing: { before: 300, after: 100, line: 276 , lineRule: LineRuleType.AUTO}, keepNext: true } },
         heading3: { run: { font: BODY, size: 22, bold: true, color: COL.accent, rightToLeft: ar }, paragraph: { spacing: { before: 240, after: 80 }, keepNext: true } },
       },
       paragraphStyles: [
-        { id: "Subtitle", name: "Subtitle", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: HEAD, size: 32, bold: true, color: COL.accent }, paragraph: { spacing: { after: 240, line: 300 } } },
+        { id: "Subtitle", name: "Subtitle", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: HEAD, size: 32, bold: true, color: COL.accent }, paragraph: { spacing: { after: 240, line: 300 , lineRule: LineRuleType.AUTO} } },
         { id: "Eyebrow", name: "Eyebrow", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: BODY, size: 18, bold: true, color: COL.accent, characterSpacing: ar ? 0 : 30 }, paragraph: { spacing: { after: 160 } } },
-        { id: "Lead", name: "Lead", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: BODY, size: 25, color: COL.onv }, paragraph: { spacing: { after: 200, line: ar ? 380 : 340 } } },
+        { id: "Lead", name: "Lead", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: BODY, size: 25, color: COL.onv }, paragraph: { spacing: { after: 200, line: ar ? 380 : 340 , lineRule: LineRuleType.AUTO} } },
         { id: "Caption", name: "Caption", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: BODY, size: 17, color: COL.muted }, paragraph: { spacing: { after: 240 } } },
         { id: "Callout", name: "Callout", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: BODY, size: 23, bold: true, color: COL.navy },
-          paragraph: { shading: { type: ShadingType.CLEAR, fill: COL.tint, color: "auto" }, spacing: { before: 200, after: 240, line: ar ? 380 : 330 }, indent: { left: 0, right: 0 },
-            border: { top: { style: BorderStyle.SINGLE, size: 36, color: COL.tint, space: 8 }, bottom: { style: BorderStyle.SINGLE, size: 36, color: COL.tint, space: 8 },
-              left: { style: BorderStyle.SINGLE, size: 36, color: COL.tint, space: 10 }, right: { style: BorderStyle.SINGLE, size: 36, color: COL.tint, space: 10 } } } },
+          paragraph: { shading: { type: ShadingType.CLEAR, fill: COL.tint, color: "auto" }, spacing: { before: 200, after: 240, line: ar ? 380 : 330 , lineRule: LineRuleType.AUTO}, indent: { left: 0, right: 0 },
+            border: { top: { style: BorderStyle.SINGLE, size: 36, color: COL.tint, space: 8 }, left: { style: BorderStyle.SINGLE, size: 36, color: COL.tint, space: 10 },
+              bottom: { style: BorderStyle.SINGLE, size: 36, color: COL.tint, space: 8 }, right: { style: BorderStyle.SINGLE, size: 36, color: COL.tint, space: 10 } } } },
         { id: "Data", name: "Data", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: MONO, size: 19, color: COL.ink, rightToLeft: false } },
         { id: "LetterSubject", name: "Letter Subject", basedOn: "Normal", next: "Normal", quickFormat: true, run: { font: HEAD, size: 26, bold: true, color: COL.black }, paragraph: { spacing: { after: 200 } } },
       ],
     },
     numbering: { config: [
       { reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.START,
-        style: { run: { color: COL.blue, bold: true }, paragraph: { indent: { left: 400, hanging: 260 } } } }] },
+        style: { run: { color: COL.blue, bold: true }, paragraph: { indent: { start: 400, hanging: 260 } } } }] },
       { reference: "steps", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.START,
-        style: { run: { color: COL.accent, bold: true }, paragraph: { indent: { left: 400, hanging: 300 } } } }] },
+        style: { run: { color: COL.accent, bold: true }, paragraph: { indent: { start: 400, hanging: 300 } } } }] },
     ] },
     sections: [{
       properties: { page: { size: A4, margin: { top: 1700, bottom: 1300, left: MARGIN, right: MARGIN, header: 640, footer: 560 } }, titlePage: true },
@@ -203,7 +204,7 @@ const TEXT = {
       h1b: "Styles in this template",
       p5: "Pick styles from the gallery instead of formatting by hand, so every Fleetana document looks the same.",
       dataLabel: "Data style",
-      data: "WO-000123 · 4271 ح ط ر · 21/10/2026 · 89,420 km",
+      data: "WO-000123 · \u20664271 ح ط ر\u2069 · 21/10/2026 · 89,420 km",
       closing: "Regards,", sigName: "Full name", sigRole: "Role, Fleetana",
     },
     table: { head: ["Vehicle", "Plate", "Status", "Next service"], caption: "Table 1 · Example fleet. Copy this table to keep the house style.",
@@ -242,7 +243,7 @@ const TEXT = {
       h1b: "الأنماط في هذا القالب",
       p5: "اختر الأنماط من المعرض بدل التنسيق اليدوي، لتبدو كل مستندات فليتانا متشابهة.",
       dataLabel: "نمط البيانات",
-      data: "WO-000123 · 4271 ح ط ر · 21/10/2026 · 89,420 km",
+      data: "WO-000123 · \u20664271 ح ط ر\u2069 · 21/10/2026 · 89,420 km",
       closing: "مع خالص التحية،", sigName: "الاسم الكامل", sigRole: "المسمى الوظيفي، فليتانا",
     },
     table: { head: ["المركبة", "اللوحة", "الحالة", "الصيانة القادمة"], caption: "جدول 1 · أسطول تجريبي. انسخ هذا الجدول للحفاظ على نمط فليتانا.",
