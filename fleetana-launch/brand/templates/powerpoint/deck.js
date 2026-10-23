@@ -68,7 +68,7 @@ function createDeck(lang, title) {
   ] });
 
   // ── slide helpers ──────────────────────────────────────────────────────────
-  const title2 = (a, b) => [{ text: a, options: { color: HEX.black, breakLine: !!b } }, ...(b ? [{ text: b, options: { color: HEX.accent } }] : [])];
+  const title2 = (a, b) => [{ text: a, options: { color: HEX.black, breakLine: !!b, rtlMode: ar } }, ...(b ? [{ text: b, options: { color: HEX.accent, rtlMode: ar } }] : [])];
   const card = (s, x, y, w, h, name, fill = HEX.white) => s.addShape(pres.shapes.ROUNDED_RECTANGLE, {
     x: X(x, w), y, w, h, rectRadius: 0.12, fill: { color: fill }, line: { color: HEX.border, width: 1 }, objectName: name,
     shadow: { type: "outer", color: "0F172A", opacity: 0.08, blur: 14, offset: 3, angle: 90 } });

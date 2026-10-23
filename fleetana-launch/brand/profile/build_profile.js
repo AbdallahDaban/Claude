@@ -1,6 +1,6 @@
 // Fleetana company profile — for prospective clients. Light, 16:9.
-//   node build_profile.js   → Fleetana-Company-Profile-EN.pptx
-// Built on the shared deck system (../templates/powerpoint/deck.js). English first; Arabic follows once the copy is final.
+//   node build_profile.js   → Fleetana-Company-Profile-EN.pptx, Fleetana-Company-Profile-AR.pptx
+// Built on the shared deck system (../templates/powerpoint/deck.js). Arabic is written natively, using the app's terms (brand skill: bilingual.md).
 // Founder photos: team/<id>.jpg (square). Missing photos fall back to initials.
 const fs = require("fs");
 const path = require("path");
@@ -13,7 +13,7 @@ async function build(lang) {
   const R = { map: 1100 / 1880, costs: 1100 / 1880, route: 1100 / 1880, reminders: 780 / 1880, inspection: 790 / 1880, papers: 1020 / 1880 };
   const DEV = { fmc003: { file: A("devices/fmc003.jpg"), ratio: 1536 / 1584 }, r12l: { file: A("devices/r12l.png"), ratio: 386 / 115 } };
   const device = (s, id, x, y, h) => { const d = DEV[id], w = h / d.ratio; s.addImage({ path: d.file, x: X(x, w), y, w, h, objectName: `device-${id}`, altText: id }); return w; };
-  const bullets = (s, pts, x, y, w, h, size = 17) => s.addText(pts.map((p, i) => ({ text: p, options: { bullet: { code: "25CF" }, breakLine: i < pts.length - 1, paraSpaceAfter: 10 } })),
+  const bullets = (s, pts, x, y, w, h, size = 17) => s.addText(pts.map((p, i) => ({ text: p, options: { bullet: { code: "25CF" }, rtlMode: ar, breakLine: i < pts.length - 1, paraSpaceAfter: 10 } })),
     txt({ x: X(x, w), y, w, h, fontSize: size, color: HEX.ink, valign: "top" }));
   const numbered = (s, pts, x, y, w, gap) => pts.forEach(([h, b], i) => {
     const yy = y + i * gap;
@@ -41,18 +41,18 @@ async function build(lang) {
   const arrow = (s, x, y, n) => s.addImage({ path: A("icons/icon-arrowRight.png"), x: X(x, 0.24), y, w: 0.24, h: 0.24, rotate: ar ? 180 : 0, objectName: `arrow-${n}` });
   const divider = (n, [t, b], sec) => {
     const s = pres.addSlide({ masterName: "Section divider", sectionTitle: sec });
-    s.addText(n, { placeholder: "number" }); s.addText(t, { placeholder: "title" }); s.addText(b, { placeholder: "body" });
+    s.addText(n, { placeholder: "number", rtlMode: ar }); s.addText(t, { placeholder: "title", rtlMode: ar }); s.addText(b, { placeholder: "body", rtlMode: ar });
   };
-  const titled = (t, sec) => { const s = pres.addSlide({ masterName: "Title only", sectionTitle: sec }); s.addText(title2(...t), { placeholder: "title" }); return s; };
+  const titled = (t, sec) => { const s = pres.addSlide({ masterName: "Title only", sectionTitle: sec }); s.addText(title2(...t), { placeholder: "title", rtlMode: ar }); return s; };
   const SEC = T.sections;
 
   // ── about ─────────────────────────────────────────────────────────────────
   pres.addSection({ title: SEC[0] });
   let s = pres.addSlide({ masterName: "Cover", sectionTitle: SEC[0] });
-  s.addText(T.cover.eyebrow, { placeholder: "eyebrow" });
-  s.addText(title2(...T.cover.title), { placeholder: "title" });
-  s.addText(T.cover.sub, { placeholder: "body" });
-  s.addText(T.cover.meta, { placeholder: "meta" });
+  s.addText(T.cover.eyebrow, { placeholder: "eyebrow", rtlMode: ar });
+  s.addText(title2(...T.cover.title), { placeholder: "title", rtlMode: ar });
+  s.addText(T.cover.sub, { placeholder: "body", rtlMode: ar });
+  s.addText(T.cover.meta, { placeholder: "meta", rtlMode: ar });
   card(s, 7.95, 1.7, 4.78, 3.0, "cover-map-card");
   ui(s, "ui-map", 8.07, 1.82, 4.54, R.map, "Fleet map");
   notes(s, T.cover.notes);
@@ -155,7 +155,7 @@ async function build(lang) {
     s.addText(d.brand, txt({ x: X(tx, tw), y: y + 0.3, w: tw, h: 0.3, fontSize: 11, bold: true, color: HEX.accent, charSpacing: ar ? 0 : 2 }));
     s.addText(d.name, txt({ x: X(tx, tw), y: y + 0.58, w: tw, h: 0.5, fontSize: 24, bold: true, color: HEX.black, fontFace: HF }));
     s.addText(d.tagline, txt({ x: X(tx, tw), y: y + 1.08, w: tw, h: 0.35, fontSize: 13, color: HEX.onv }));
-    s.addText(d.points.map((p, k) => ({ text: p, options: { bullet: { code: "25CF" }, breakLine: k < d.points.length - 1, paraSpaceAfter: 5 } })),
+    s.addText(d.points.map((p, k) => ({ text: p, options: { bullet: { code: "25CF" }, rtlMode: ar, breakLine: k < d.points.length - 1, paraSpaceAfter: 5 } })),
       txt({ x: X(tx, tw), y: y + 1.55, w: tw, h: 2.2, fontSize: 12.5, color: HEX.ink, valign: "top" }));
     s.addText([{ text: T.devices.bestFor, options: { bold: true, color: HEX.navy } }, { text: d.bestFor, options: { color: HEX.navy } }],
       txt({ x: X(x + 0.3, w - 0.6), y: y + h - 0.68, w: w - 0.6, h: 0.44, fontSize: 13, fill: { color: HEX.tint }, shape: pres.shapes.ROUNDED_RECTANGLE, rectRadius: 0.1,
@@ -185,7 +185,7 @@ async function build(lang) {
     card(s, x, y, w, h, `saving-${i + 1}`);
     iconDot(s, x + 0.3, y + 0.3, ic);
     s.addText(hd, txt({ x: X(x + 0.3, w - 0.6), y: y + 1.12, w: w - 0.6, h: 0.5, fontSize: 20, bold: true, color: HEX.black, fontFace: HF }));
-    s.addText(pts.map((p, k) => ({ text: p, options: { bullet: { code: "25CF" }, breakLine: k < pts.length - 1, paraSpaceAfter: 7 } })),
+    s.addText(pts.map((p, k) => ({ text: p, options: { bullet: { code: "25CF" }, rtlMode: ar, breakLine: k < pts.length - 1, paraSpaceAfter: 7 } })),
       txt({ x: X(x + 0.3, w - 0.6), y: y + 1.72, w: w - 0.6, h: h - 1.9, fontSize: 13, color: HEX.onv, valign: "top" }));
   });
   notes(s, T.savings.notes);
@@ -229,8 +229,8 @@ async function build(lang) {
   notes(s, T.team.notes);
 
   s = pres.addSlide({ masterName: "Closing", sectionTitle: SEC[5] });
-  s.addText(T.closing[0], { placeholder: "title" });
-  s.addText(T.closing[1], { placeholder: "body" });
+  s.addText(T.closing[0], { placeholder: "title", rtlMode: ar });
+  s.addText(T.closing[1], { placeholder: "body", rtlMode: ar });
 
   const out = path.join(__dirname, `Fleetana-Company-Profile-${lang.toUpperCase()}.pptx`);
   await save(out);
@@ -338,8 +338,109 @@ const COPY = {
       ["abdallah", "Abdallah Daban", "Operations & Strategy"], ["abdulrahman", "Abdulrahman Alaskar", "Product Manager"],
       ["faisal", "Faisal Qassem", "Business Development"], ["ali", "Ali Choudhary", "Business & Customer Manager"]],
       notes: "Four founders, one team: operations, product, business development and customers." },
-    closing: ["Get your fleet off spreadsheets.", "fleetana.sa  ·  info@fleetana.sa"],
+    closing: ["Get your fleet off spreadsheets.", "fleetana.sa  ·  admin@fleetana.sa"],
+  },
+  ar: {
+    meta: { title: "فليتانا — الملف التعريفي" },
+    sections: ["من نحن", "المشكلة", "الحل", "أجهزة التتبع", "التوفير", "العمل معنا"],
+    tag: "جهاز تتبع فليتانا",
+    cover: { eyebrow: "الملف التعريفي", title: ["أسطولك كله.", "في مكان واحد."], sub: "رؤية كاملة لأسطولك وتكاليفه، صُمّمت للأساطيل السعودية",
+      meta: "فليتانا · 2026 · fleetana.sa", notes: "الملف التعريفي لفليتانا للعملاء المحتملين." },
+    who: { title: ["من", "نحن"],
+      lead: "فليتانا نظام لإدارة الأساطيل، صُمّم في المملكة العربية السعودية لمن يديرون المركبات.",
+      points: [
+        "منصة واحدة للمركبات والسائقين والمسارات والوقود والصيانة والفحوصات وأوامر العمل",
+        "يُظهر ما تفعله كل مركبة، وكم تكلّف كل مركبة",
+        "أجهزة تتبع نوفّرها ونركّبها بفريقنا",
+        "تطبيق ويب للمديرين وتطبيق جوال للسائقين، بالعربية والإنجليزية"],
+      facts: [["سنة التأسيس", "2026"], ["المقر الرئيسي", "الرياض، المملكة العربية السعودية"], ["السجل التجاري", "7051877566"], ["اللغات", "العربية · English"]],
+      notes: "النظام والأجهزة من شريك سعودي واحد." },
+    vm: { title: ["الرؤية", "والرسالة"], items: [
+      ["الرؤية", "أن تُدار كل الأساطيل السعودية بالحقائق، بدورة حياة فعّالة ومُحسَّنة."],
+      ["الرسالة", "مكان واحد ترى فيه كل مركبة، وتكلفتها، ومهمتها التالية، وتنفيذها."]],
+      notes: "اقرأ السطرين بصوت واضح ودعهما يتحدثان." },
+    div: [["المشكلة", "أساطيل تُدار بجداول البيانات والإيصالات والذاكرة"],
+      ["الحل", "النظام وأجهزة التتبع من شريك واحد"],
+      ["أجهزة التتبع", "أجهزة نوفّرها ونركّبها وندعمها"]],
+    problem: { title: ["أين تذهب", "أموال أسطولك؟"], cards: [
+      ["clipboard", "جداول البيانات", "مواعيد الصيانة واللوحات وتواريخ الاستمارة في ملفات لا تُحدَّث في وقتها."],
+      ["fuel", "الإيصالات", "مصاريف الوقود والإصلاح في الأدراج والصور، فتمر التعبئة غير المعتادة دون انتباه."],
+      ["pin", "نقاط عمياء", "لا أحد يعرف أي طريق سلكته المركبة، ولا كم بقيت متوقفة والمحرك يعمل."],
+      ["bell", "محادثات الواتساب", "الفحوصات والأعطال والموافقات في المحادثات، ولا شيء مرتبط بالمركبة."]],
+      notes: "اسأل العميل: أي هذه الأربع يشبه أسبوعه أكثر؟" },
+    how: { title: ["كيف يعمل", "فليتانا"], steps: [
+      ["في كل مركبة", "جهاز التتبع", "نوفّر ونركّب الجهاز المناسب لكل مركبة، من البيك أب إلى الشاحنات الثقيلة."],
+      ["على منصة واحدة", "فليتانا على الويب والجوال", "الموقع والرحلات والوقود والصيانة والتكاليف في مكان واحد، لكل مركبة."],
+      ["في قراراتك", "ارَ، قرّر، وفّر", "اكشف الهدر، وتصرّف، وشاهد تكلفة كل مركبة تنخفض."]],
+      notes: "العرض كله في شريحة واحدة: الجهاز، والنظام، والنتيجة." },
+    overview: { title: ["كل ما يتعلق", "بأسطولك"], items: [
+      ["truck", "المركبات والوثائق", "اللوحات والسائقون والاستمارة والتأمين والفحص الدوري لكل مركبة."],
+      ["wrench", "الصيانة والوقاية", "برامج بالكيلومترات أو ساعات التشغيل أو التاريخ، مع القادم والمتأخر بنظرة."],
+      ["fuel", "الوقود", "كم/لتر لكل تعبئة كاملة، والتعبئة غير المعتادة تظهر بعلامة «منخفض»."],
+      ["clipboard", "الفحوصات والبلاغات", "قوائم فحص مخصصة مع الصور، والبند الفاشل يفتح بلاغًا."],
+      ["check", "أوامر العمل والقطع", "القطع والعمالة والرسوم، مع ضريبة 15٪ وخطوات الاعتماد."],
+      ["pin", "الخريطة والمسارات", "المواقع المباشرة وإعادة الرحلات والمسارات المُحسَّنة وأداء السائقين."]],
+      notes: "الوحدات الست. الشرائح التالية تتعمق فيها." },
+    fleetVis: { title: ["اعرف ما تفعله", "كل مركبة"], points: [
+      ["pin", "خريطة الأسطول", "كل مركبة: تتحرك، أو خاملة، أو متوقفة، أو بلا إشارة، وتُحدَّث كل بضع ثوانٍ."],
+      ["chart", "إعادة الرحلات", "شاهد الطريق الذي سلكته كل مركبة فعليًا، محطة بمحطة."],
+      ["alert", "وقت الخمول", "دقائق تشغيل المحرك والمركبة متوقفة، لكل رحلة ولكل يوم."],
+      ["users", "أداء السائقين", "القيادة العنيفة والسرعة الزائدة والحوادث في تقييم من 0 إلى 100."]],
+      notes: "يعمل بجهاز تتبع فليتانا في كل مركبة." },
+    costVis: { title: ["اعرف أين تذهب", "أموال أسطولك فعلًا"], points: [
+      ["تكلفة كل مركبة", "الوقود والصيانة وأوامر العمل تُجمع لكل مركبة بالريال، مع التكلفة لكل كيلومتر."],
+      ["تعبئة غير معتادة", "التعبئة الكاملة الأقل من 70٪ من متوسط المركبة خلال 30 يومًا تظهر بعلامة «منخفض»."],
+      ["كل ريال مفصّل", "أوامر العمل تفصل القطع والعمالة والرسوم، مع ضريبة 15٪."],
+      ["الضمان محفوظ", "تحقّق من الضمان قبل أن تدفع ثمن الإصلاح نفسه مرتين."]],
+      notes: "الأرقام في الصورة بيانات توضيحية." },
+    route: { title: ["مسارات أقصر،", "ووقود أقل"], points: [
+      ["مسارات مُحسَّنة", "يرتّب فليتانا محطاتك في أقصر مسار قبل أن تنطلق المركبة."],
+      ["المخطط مقابل الفعلي", "قارن المسار الذي خططت له بالمسار الذي سُلك فعلًا."],
+      ["كيلومترات أقل هدرًا", "كل كيلومتر توفّره وقود ووقت واستهلاك لا تدفع ثمنه."]],
+      notes: "الخريطة والمسافات بيانات توضيحية." },
+    maint: { title: ["صيانة تسير", "في موعدها"], points: [
+      "مواعيد الصيانة بالكيلومترات أو ساعات التشغيل أو التاريخ، أيّها أسبق",
+      "36 مهمة صيانة قياسية جاهزة من اليوم الأول",
+      "فحوصات على تطبيق الجوال مع الصور، والبند الفاشل يفتح بلاغًا تلقائيًا",
+      "أوامر عمل بالقطع والعمالة والرسوم وضريبة 15٪ وخطوات الاعتماد",
+      "مخزون القطع لكل موقع، وفترات الضمان على القطع والإصلاحات"],
+      notes: "بيانات توضيحية على الشاشة." },
+    devices: { title: ["جهازان،", "لكل مركبة في أسطولك"], bestFor: "الأنسب لـ: ", notes: "نوفّر الجهازين ونركّبهما وندعمهما.", items: [
+      { id: "fmc003", brand: "TELTONIKA", name: "FMC003", tagline: "جهاز تتبع يُركَّب في منفذ OBD",
+        points: ["يُركَّب في منفذ OBD-II خلال دقائق، دون أسلاك", "شبكة 4G مع GPS وGLONASS وGalileo وBeiDou",
+          "يقرأ عدّاد المركبة ومستوى الوقود منها مباشرة", "رصد القيادة الاقتصادية والحوادث والسحب والفصل", "معتمد من هيئة الاتصالات والفضاء والتقنية"],
+        bestFor: "السيارات والبيك أب والفانات" },
+      { id: "r12l", brand: "SEEWORLD", name: "R12L", tagline: "جهاز تتبع سلكي لأي مركبة",
+        points: ["تركيب مخفي، ويعمل من 9 إلى 90 فولت للشاحنات والحافلات والمعدات", "شبكة 4G مع GPS وBeiDou", "مقاوم للغبار والماء IP65",
+          "إيقاف المحرك عن بُعد ورصد تشغيل المحرك", "تنبيهات الاهتزاز وانقطاع الكهرباء والسرعة الزائدة"],
+        bestFor: "الشاحنات والحافلات والمعدات والحماية من السرقة" }] },
+    unlocks: { title: ["ماذا يتيح", "كل جهاز"], head: ["ميزة فليتانا", "FMC003", "R12L"], rows: [
+      ["خريطة الأسطول وإعادة الرحلات", 1, 1], ["وقت الخمول وأداء السائقين", 1, 1], ["تحسين المسارات", 1, 1], ["تنبيهات السرعة الزائدة", 1, 1],
+      ["تنبيهات العبث (الفصل / انقطاع الكهرباء)", 1, 1], ["رصد الحوادث", 1, 0], ["مستوى الوقود والعدّاد من المركبة", 1, 0],
+      ["إيقاف المحرك عن بُعد", 0, 1], ["الشاحنات والمعدات الثقيلة (حتى 90 فولت)", 0, 1]],
+      cardTitle: "نوفّرها ونركّبها وندعمها", cardPoints: ["نختار الجهاز المناسب لكل مركبة", "فريقنا يتولى التركيب", "تعمل على فليتانا في اليوم نفسه", "شريك واحد للنظام والأجهزة"],
+      notes: "الأساطيل المختلطة تستخدم الجهازين غالبًا: FMC003 للمركبات الخفيفة وR12L للثقيلة." },
+    savings: { title: ["اكشف الهدر،", "وأوقفه."], groups: [
+      ["fuel", "الوقود", ["تعبئة غير معتادة تظهر فورًا", "وقت خمول أقل", "مسارات أقصر ومُحسَّنة"]],
+      ["wrench", "الصيانة", ["صيانة قبل الأعطال", "لا دفع مرتين لإصلاح تحت الضمان", "كل أمر عمل مفصّل"]],
+      ["truck", "الأسطول", ["تكلفة كل مركبة ولكل كيلومتر", "استبعاد المركبات الأعلى تكلفة", "وثائق سارية دائمًا"]],
+      ["shield", "السلامة", ["تقييم السائقين وتوجيههم", "تنبيهات الحوادث والسرعة الزائدة", "إيقاف المحرك عن بُعد"]]],
+      notes: "من أين يأتي التوفير. كل بند إجراء يتخذه العميل بناءً على ما يُظهره فليتانا." },
+    saudi: { title: ["صُمّم", "للأساطيل السعودية"], chips: ["الاستمارة", "الفحص الدوري", "التأمين", "الريال وضريبة 15٪", "أجهزة معتمدة من الهيئة", "العربية · English"],
+      whoTitle: "لأساطيل مثل أسطولك", who: [["truck", "التوصيل والشحن"], ["wrench", "البناء والمعدات الثقيلة"], ["box", "التوزيع والتجزئة"], ["users", "نقل الركاب والنقل المدرسي"]],
+      papers: "تواريخ الانتهاء محفوظة في سجل كل مركبة، والرئيسية تعرض ما ينتهي خلال 30 يومًا.", notes: "عدّل القطاعات حسب العميل." },
+    onboard: { title: ["كيف نبدأ", "معك"], steps: [
+      ["users", "سجّل", "أنشئ مساحة عملك على fleetana.sa وادعُ فريقك."],
+      ["truck", "أضف مركباتك", "المركبات والسائقون وتواريخ الوثائق، استيرادًا أو يدويًا."],
+      ["wrench", "نركّب الأجهزة", "الجهاز المناسب لكل مركبة، يركّبه فريقنا."],
+      ["chart", "ارَ، قرّر، وفّر", "الخريطة والتكاليف والتوفير من اليوم الأول."]],
+      notes: "معظم الإعداد يتم في الأسبوع الأول." },
+    team: { title: ["المؤسسون", "خلف فليتانا"], people: [
+      ["abdallah", "عبدالله دبان", "العمليات والاستراتيجية"], ["abdulrahman", "عبدالرحمن العسكر", "مدير المنتج"],
+      ["faisal", "فيصل قاسم", "تطوير الأعمال"], ["ali", "علي شودري", "مدير الأعمال والعملاء"]],
+      notes: "أربعة مؤسسين، فريق واحد: العمليات، والمنتج، وتطوير الأعمال، والعملاء." },
+    closing: ["أخرج أسطولك من جداول البيانات.", "fleetana.sa  ·  admin@fleetana.sa"],
   },
 };
 
-(async () => { await build("en"); })();
+(async () => { await build("en"); await build("ar"); })();
