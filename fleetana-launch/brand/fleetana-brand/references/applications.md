@@ -41,12 +41,12 @@ The working files are in the launch repo `fleetana-launch/`. Every one is genera
   - Optional phone and email lines, then `fleetana.sa` in `#0051D5`.
   - Then the animated banner.
   - Arabic name and role are optional, as a second RTL block.
-- **Animation:** 480×120 shown (960×240 file), about 4 s, plays **once** and holds on the logo.
+- **Animation:** 480×120 shown (960×240 file), 4.6 s, plays **once** and holds on the logo.
   1. A white pickup drives in.
   2. A scan line sweeps it, and check points pop on lights, tyres and brakes (an inspection, not diagnostics).
   3. The car folds into the chevron F and FLEETANA builds.
-- **Outlook (Windows desktop) shows only the first frame of a GIF.** Use `signature-outlook.gif`, whose first frame is the finished logo.
-- **Hosting:** host the GIF on fleetana.sa; email clients block local or attached images in signatures. Generate each employee's signature with `signature-generator.html`.
+- **Outlook (Windows desktop) shows only the first frame of a GIF.** Use `fleetana-signature-{en,ar}-outlook.gif`, whose first frame is the finished logo.
+- **Hosting:** host the four GIFs (`fleetana-signature-{en,ar}.gif` and their `-outlook` versions) on fleetana.sa, e.g. `https://fleetana.sa/email/`; email clients block local or attached images in signatures. Generate each employee's signature with `signature-generator.html`.
 
 ## Video
 - **16:9 films** (40 s hero, 30 s cost story) and **9:16 reels** (15–30 s).

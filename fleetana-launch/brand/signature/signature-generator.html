@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fleetana Signature Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --blue:#2A89FA; --accent:#0051D5; --navy:#1E3A8A; --ink:#0F172A; --onv:#45464D; --muted:#64748B; --paper:#F7F9FB; --tint:#E8F2FF; --border:#D9D9D9; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 Inter, Arial, sans-serif; }
+  main { max-width: 1060px; margin: 0 auto; padding: 40px 24px 64px; }
+  header img { height: 26px; display: block; }
+  h1 { font: 700 40px/1.1 "Hanken Grotesk", Arial, sans-serif; letter-spacing: -0.02em; margin: 28px 0 6px; color: #000; }
+  h1 span { color: var(--accent); }
+  p.lead { color: var(--onv); margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .card { background: #fff; border: 1.5px solid var(--border); border-radius: 18px; padding: 22px; box-shadow: 0 18px 40px rgba(15,23,42,.08); }
+  label { display: block; font-weight: 600; font-size: 13px; margin: 14px 0 6px; }
+  label small { color: var(--muted); font-weight: 500; }
+  input[type=text], input[type=email], input[type=tel], input[type=url] { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 10px; font: inherit; color: var(--ink); background: #fff; }
+  input:focus { outline: 3px solid rgba(42,137,250,.35); border-color: var(--blue); }
+  input[dir=rtl] { font-family: "IBM Plex Sans Arabic", Tahoma, sans-serif; }
+  .row { display: flex; gap: 10px; align-items: center; margin-top: 14px; font-size: 14px; }
+  .row label { margin: 0; font-weight: 500; }
+  .seg { display: inline-flex; border: 1.5px solid var(--border); border-radius: 999px; overflow: hidden; }
+  .seg button { border: 0; background: #fff; padding: 6px 14px; font: 600 13px Inter, Arial; color: var(--onv); cursor: pointer; }
+  .seg button[aria-pressed=true] { background: var(--tint); color: var(--navy); }
+  .preview-wrap { background: #fff; border: 1.5px solid var(--border); border-radius: 18px; padding: 28px; min-height: 260px; overflow-x: auto; }
+  .preview-label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 14px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .btn { border: 0; border-radius: 999px; padding: 12px 22px; font: 600 14px Inter, Arial; cursor: pointer; }
+  .btn.primary { background: #000; color: #fff; }
+  .btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--border); }
+  .status { font-size: 13px; color: #15803D; min-height: 20px; margin-top: 8px; }
+  .help { margin-top: 24px; }
+  .help h2 { font: 700 20px "Hanken Grotesk", Arial; margin: 0 0 10px; }
+  .help ol { margin: 0; padding-left: 20px; color: var(--onv); }
+  .help li { margin: 4px 0; }
+  .note { background: var(--tint); color: var(--navy); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; margin-top: 14px; }
+  code { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 12.5px; background: var(--paper); padding: 1px 5px; border-radius: 4px; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } h1 { font-size: 32px; } }
+</style>
+</head>
+<body>
+<main>
+  <header><img src="../assets/logo-blue.png" alt="Fleetana"></header>
+  <h1>Email signature<br><span>for every Fleetana employee</span></h1>
+  <p class="lead">Fill in your details, check the preview, then copy the signature into your email app. The banner plays once and holds on the logo.</p>
+
+  <div class="grid">
+    <form class="card" id="f" autocomplete="off">
+      <label for="name">Full name</label>
+      <input id="name" type="text" value="Full Name">
+      <label for="role">Role</label>
+      <input id="role" type="text" value="Role">
+      <label for="nameAr">الاسم الكامل <small>(optional)</small></label>
+      <input id="nameAr" type="text" dir="rtl" placeholder="الاسم بالعربية">
+      <label for="roleAr">المسمى الوظيفي <small>(optional)</small></label>
+      <input id="roleAr" type="text" dir="rtl" placeholder="المسمى بالعربية">
+      <label for="phone">Phone <small>(optional)</small></label>
+      <input id="phone" type="tel" placeholder="+966 5X XXX XXXX">
+      <label for="email">Email <small>(optional)</small></label>
+      <input id="email" type="email" placeholder="name@fleetana.sa">
+      <div class="row">Banner language
+        <span class="seg" role="group" aria-label="Banner language">
+          <button type="button" data-lang="en" aria-pressed="true">English</button><button type="button" data-lang="ar" aria-pressed="false">العربية</button>
+        </span>
+      </div>
+      <div class="row"><input id="outlook" type="checkbox"><label for="outlook">I use Outlook for Windows</label></div>
+      <label for="base">Banner hosted at <small>(your team sets this once)</small></label>
+      <input id="base" type="url" value="https://fleetana.sa/email/">
+    </form>
+
+    <div>
+      <div class="preview-wrap">
+        <div class="preview-label">Preview</div>
+        <div id="preview"></div>
+      </div>
+      <div class="actions">
+        <button class="btn primary" id="copy" type="button">Copy signature</button>
+        <button class="btn ghost" id="copyHtml" type="button">Copy HTML</button>
+        <button class="btn ghost" id="download" type="button">Download .html</button>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+
+      <div class="card help">
+        <h2>Add it to your email</h2>
+        <ol>
+          <li><b>Gmail:</b> Settings → See all settings → Signature → Create new → paste.</li>
+          <li><b>Outlook (web and new Outlook):</b> Settings → Mail → Compose and reply → Email signature → paste.</li>
+          <li><b>Outlook for Windows (classic):</b> tick "I use Outlook for Windows" first. Then File → Options → Mail → Signatures → New → paste.</li>
+          <li><b>Apple Mail:</b> Settings → Signatures → + → paste, then untick "Always match my default message font".</li>
+        </ol>
+        <div class="note">The banner must be hosted on the web, because email apps block local images. Upload the four GIFs in this folder to the address above (for example <code>https://fleetana.sa/email/</code>) once, and every signature will use them. Classic Outlook for Windows shows only the first frame of a GIF, so its version starts on the finished logo.</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+  const $ = id => document.getElementById(id);
+  let bannerLang = "en";
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const telHref = s => s.replace(/[^\d+]/g, "");
+
+  // Email-safe markup: tables, inline styles, web-safe fonts (email apps can't load brand fonts).
+  function signatureHTML(previewSrc) {
+    const name = $("name").value.trim(), role = $("role").value.trim();
+    const nameAr = $("nameAr").value.trim(), roleAr = $("roleAr").value.trim();
+    const phone = $("phone").value.trim(), email = $("email").value.trim();
+    const base = $("base").value.trim().replace(/\/?$/, "/");
+    const file = `fleetana-signature-${bannerLang}${$("outlook").checked ? "-outlook" : ""}.gif`;
+    const src = previewSrc ? file : base + file;
+    const font = "font-family:Arial,Helvetica,sans-serif;";
+    const ar = "font-family:Tahoma,Arial,sans-serif;";
+    const contact = [
+      phone && `<a href="tel:${esc(telHref(phone))}" style="color:#45464D;text-decoration:none;">${esc(phone)}</a>`,
+      email && `<a href="mailto:${esc(email)}" style="color:#45464D;text-decoration:none;">${esc(email)}</a>`,
+      `<a href="https://fleetana.sa" style="color:#0051D5;font-weight:bold;text-decoration:none;">fleetana.sa</a>`,
+    ].filter(Boolean).join(`<span style="color:#D9D9D9;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>`);
+    return `<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="${font}border-collapse:collapse;color:#0F172A;">
+<tr><td style="${font}font-size:16px;line-height:20px;font-weight:bold;color:#0F172A;padding:0 0 2px 0;">${esc(name)}</td></tr>
+<tr><td style="${font}font-size:13px;line-height:18px;color:#45464D;padding:0 0 ${nameAr || roleAr ? 6 : 8}px 0;">${esc(role)}${role ? " · " : ""}Fleetana</td></tr>
+${nameAr || roleAr ? `<tr><td dir="rtl" style="${ar}font-size:14px;line-height:22px;color:#0F172A;text-align:left;padding:0 0 8px 0;"><b>${esc(nameAr)}</b>${nameAr && roleAr ? " · " : ""}<span style="color:#45464D;">${esc(roleAr)}</span>${roleAr || nameAr ? " · فليتانا" : ""}</td></tr>` : ""}
+<tr><td style="${font}font-size:12px;line-height:18px;color:#45464D;padding:0 0 10px 0;">${contact}</td></tr>
+<tr><td style="padding:0;"><a href="https://fleetana.sa" style="text-decoration:none;"><img src="${esc(src)}" width="480" height="120" alt="Fleetana" style="display:block;border:0;width:480px;height:120px;"></a></td></tr>
+</table>`;
+  }
+
+  function render() { $("preview").innerHTML = signatureHTML(true); }
+  document.querySelectorAll("#f input").forEach(i => i.addEventListener("input", render));
+  document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => {
+    bannerLang = b.dataset.lang;
+    document.querySelectorAll(".seg button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    render();
+  }));
+  const say = m => { $("status").textContent = m; setTimeout(() => ($("status").textContent = ""), 3500); };
+
+  $("copy").addEventListener("click", async () => {
+    const html = signatureHTML(false);
+    try {
+      await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob([$("name").value], { type: "text/plain" }) })]);
+      say("Copied. Paste it into your email app's signature settings.");
+    } catch {
+      // fallback: select a rendered copy and use the legacy copy command
+      const box = document.createElement("div"); box.innerHTML = html; box.style.position = "fixed"; box.style.left = "-9999px"; document.body.appendChild(box);
+      const r = document.createRange(); r.selectNodeContents(box); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      document.execCommand("copy"); sel.removeAllRanges(); box.remove(); say("Copied.");
+    }
+  });
+  $("copyHtml").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(signatureHTML(false)); say("HTML copied."); } catch { say("Copy failed: use Download instead."); }
+  });
+  $("download").addEventListener("click", () => {
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Fleetana signature</title></head><body>${signatureHTML(false)}</body></html>`;
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], { type: "text/html" }));
+    a.download = `fleetana-signature-${($("name").value || "employee").trim().toLowerCase().replace(/\s+/g, "-")}.html`; a.click();
+  });
+  render();
+</script>
+</body>
+</html>
