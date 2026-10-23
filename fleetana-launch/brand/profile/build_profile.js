@@ -336,7 +336,7 @@ const COPY = {
       notes: "Most of setup happens in the first week." },
     team: { title: ["The founders", "behind Fleetana"], people: [
       ["abdallah", "Abdallah Daban", "Operations & Strategy"], ["abdulrahman", "Abdulrahman Alaskar", "Product Manager"],
-      ["faisal", "Faisal Qassem", "Business Development"], ["ali", "Ali Choudhary", "Business & Customer Manager"]],
+      ["faisal", "Faisal Sharif", "Business Development"], ["ali", "Ali Choudhary", "Business & Customer Manager"]],
       notes: "Four founders, one team: operations, product, business development and customers." },
     closing: ["Get your fleet off spreadsheets.", "fleetana.sa  ·  admin@fleetana.sa"],
   },
@@ -436,8 +436,8 @@ const COPY = {
       ["chart", "ارَ، قرّر، وفّر", "الخريطة والتكاليف والتوفير من اليوم الأول."]],
       notes: "معظم الإعداد يتم في الأسبوع الأول." },
     team: { title: ["المؤسسون", "خلف فليتانا"], people: [
-      ["abdallah", "عبدالله دبان", "العمليات والاستراتيجية"], ["abdulrahman", "عبدالرحمن العسكر", "مدير المنتج"],
-      ["faisal", "فيصل قاسم", "تطوير الأعمال"], ["ali", "علي شودري", "مدير الأعمال والعملاء"]],
+      ["abdallah", "عبدالله ضبان", "العمليات والاستراتيجية"], ["abdulrahman", "عبدالرحمن العسكر", "مدير المنتج"],
+      ["faisal", "فيصل شريف", "تطوير الأعمال"], ["ali", "علي شودري", "مدير الأعمال والعملاء"]],
       notes: "أربعة مؤسسين، فريق واحد: العمليات، والمنتج، وتطوير الأعمال، والعملاء." },
     closing: ["أخرج أسطولك من جداول البيانات.", "fleetana.sa  ·  admin@fleetana.sa"],
   },
